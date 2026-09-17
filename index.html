@@ -790,6 +790,9 @@
     <p>Type your full name (first, father's, and family name) to register. After that, you'll only ever see your own attendance on this device.</p>
     <div class="add-teacher-row">
       <input id="register-name-input" type="text" placeholder="e.g. Faarax Cali Nuur" maxlength="60">
+    </div>
+    <div class="add-teacher-row">
+      <input id="register-phone-input" type="tel" placeholder="Phone number (optional)" maxlength="20">
       <button id="register-name-btn" type="button">Register</button>
     </div>
     <div class="panel-status" id="register-status-line"></div>
@@ -817,6 +820,9 @@
       <h3>Teachers</h3>
       <div class="add-teacher-row">
         <input id="new-teacher-input" type="text" placeholder="Teacher's name" maxlength="60">
+      </div>
+      <div class="add-teacher-row">
+        <input id="new-teacher-phone-input" type="tel" placeholder="Phone number (optional)" maxlength="20">
         <button id="add-teacher-btn" type="button">Add</button>
       </div>
       <div class="teacher-manage-list" id="teacher-manage-list"></div>
@@ -847,6 +853,22 @@
         </div>
         <button id="use-my-location-btn" type="button">Add Branch at My Location</button>
       </div>
+    </div>
+
+    <div class="admin-section">
+      <h3>Reports &amp; Export</h3>
+      <div class="settings-row" style="margin-bottom:10px;">
+        <div class="field">
+          <label for="report-from-input">From</label>
+          <input id="report-from-input" type="date">
+        </div>
+        <div class="field">
+          <label for="report-to-input">To</label>
+          <input id="report-to-input" type="date">
+        </div>
+        <button id="export-csv-btn" type="button">Export CSV</button>
+      </div>
+      <div class="teacher-manage-list" id="report-summary-list" style="max-height:220px;"></div>
     </div>
 
     <div class="panel-status" id="admin-status-line"></div>
@@ -896,6 +918,7 @@
   const switchIdentityBtn = document.getElementById("switch-identity-btn");
   const identityPanel = document.getElementById("identity-panel");
   const registerNameInput = document.getElementById("register-name-input");
+  const registerPhoneInput = document.getElementById("register-phone-input");
   const registerNameBtn = document.getElementById("register-name-btn");
   const registerStatusLine = document.getElementById("register-status-line");
 
@@ -919,8 +942,13 @@
   const adminPanel = document.getElementById("admin-panel");
   const adminCloseBtn = document.getElementById("admin-close-btn");
   const newTeacherInput = document.getElementById("new-teacher-input");
+  const newTeacherPhoneInput = document.getElementById("new-teacher-phone-input");
   const addTeacherBtn = document.getElementById("add-teacher-btn");
   const teacherManageList = document.getElementById("teacher-manage-list");
+  const reportFromInput = document.getElementById("report-from-input");
+  const reportToInput = document.getElementById("report-to-input");
+  const exportCsvBtn = document.getElementById("export-csv-btn");
+  const reportSummaryList = document.getElementById("report-summary-list");
   const startTimeInput = document.getElementById("start-time-input");
   const saveStartTimeBtn = document.getElementById("save-start-time-btn");
   const adminStatusLine = document.getElementById("admin-status-line");
@@ -1270,12 +1298,16 @@
       becomeTeacher(existing.id);
       return;
     }
+    const phone = registerPhoneInput.value.trim();
     registerNameBtn.disabled = true;
     registerStatusLine.textContent = "Registering...";
     try {
       await authReady;
-      const ref = await db.collection("teachers").add({ name, createdAt: Date.now() });
+      const doc = { name, createdAt: Date.now() };
+      if (phone) doc.phone = phone;
+      const ref = await db.collection("teachers").add(doc);
       registerNameInput.value = "";
+      registerPhoneInput.value = "";
       registerStatusLine.textContent = "";
       becomeTeacher(ref.id);
     } catch (e) {
@@ -1355,7 +1387,7 @@
       const row = document.createElement("div");
       row.className = "teacher-manage-row";
       const name = document.createElement("span");
-      name.textContent = t.name;
+      name.textContent = t.phone ? t.name + " · " + t.phone : t.name;
       const del = document.createElement("button");
       del.type = "button";
       del.textContent = "Remove";
@@ -1405,9 +1437,106 @@
     renderTeacherManageList();
     startTimeInput.value = settings.startTime || "08:00";
     renderBranchManageList();
+    if (!reportFromInput.value || !reportToInput.value) {
+      const now = new Date();
+      const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      reportFromInput.value = dayKey(firstOfMonth.getTime());
+      reportToInput.value = todayKey();
+    }
+    renderReportSummary();
     adminStatusLine.textContent = "";
     adminPanel.hidden = false;
   }
+
+  // ---------- reports & export ----------
+  function recordsInRange(fromKey, toKey) {
+    const rows = [];
+    for (const [dateKey, dayMap] of attendanceByDate.entries()) {
+      if (dateKey < fromKey || dateKey > toKey) continue;
+      for (const rec of dayMap.values()) rows.push(rec);
+    }
+    rows.sort((a, b) => (a.date + a.teacherName).localeCompare(b.date + b.teacherName));
+    return rows;
+  }
+
+  function renderReportSummary() {
+    const fromKey = reportFromInput.value || todayKey();
+    const toKey = reportToInput.value || todayKey();
+    const rows = recordsInRange(fromKey, toKey);
+
+    const byTeacher = new Map();
+    for (const t of teachers) byTeacher.set(t.id, { name: t.name, present: 0, late: 0, hours: 0 });
+    for (const rec of rows) {
+      if (!byTeacher.has(rec.teacherId)) byTeacher.set(rec.teacherId, { name: rec.teacherName, present: 0, late: 0, hours: 0 });
+      const entry = byTeacher.get(rec.teacherId);
+      if (rec.checkInAt) {
+        entry.present++;
+        if (isLate(rec.checkInAt)) entry.late++;
+        if (rec.checkOutAt) entry.hours += (rec.checkOutAt - rec.checkInAt) / 3600000;
+      }
+    }
+
+    reportSummaryList.innerHTML = "";
+    const sorted = Array.from(byTeacher.values()).sort((a, b) => a.name.localeCompare(b.name));
+    if (sorted.length === 0) {
+      const row = document.createElement("div");
+      row.className = "teacher-manage-row";
+      row.textContent = "No data in this range.";
+      reportSummaryList.appendChild(row);
+      return;
+    }
+    for (const entry of sorted) {
+      const row = document.createElement("div");
+      row.className = "teacher-manage-row";
+      const name = document.createElement("span");
+      name.textContent = entry.name;
+      const stats = document.createElement("span");
+      stats.style.color = "var(--ink-soft)";
+      stats.style.fontSize = "12px";
+      stats.textContent = entry.present + " present · " + entry.late + " late · " + entry.hours.toFixed(1) + "h";
+      row.appendChild(name);
+      row.appendChild(stats);
+      reportSummaryList.appendChild(row);
+    }
+  }
+
+  reportFromInput.addEventListener("change", renderReportSummary);
+  reportToInput.addEventListener("change", renderReportSummary);
+
+  function csvEscape(val) {
+    const s = String(val == null ? "" : val);
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+
+  exportCsvBtn.addEventListener("click", () => {
+    const fromKey = reportFromInput.value || todayKey();
+    const toKey = reportToInput.value || todayKey();
+    const rows = recordsInRange(fromKey, toKey);
+    const header = ["Date", "Teacher", "Check In", "Check Out", "Status", "Branch", "Hours"];
+    const lines = [header.map(csvEscape).join(",")];
+    for (const rec of rows) {
+      const status = statusForRecord(rec).label;
+      const hours = rec.checkInAt && rec.checkOutAt ? ((rec.checkOutAt - rec.checkInAt) / 3600000).toFixed(2) : "";
+      lines.push([
+        rec.date,
+        rec.teacherName,
+        rec.checkInAt ? timeLabel(rec.checkInAt) : "",
+        rec.checkOutAt ? timeLabel(rec.checkOutAt) : "",
+        status,
+        rec.branch || "",
+        hours,
+      ].map(csvEscape).join(","));
+    }
+    const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "rowda-attendance_" + fromKey + "_to_" + toKey + ".csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
 
   adminCloseBtn.addEventListener("click", () => { adminPanel.hidden = true; });
 
@@ -1423,11 +1552,15 @@
   addTeacherBtn.addEventListener("click", async () => {
     const name = newTeacherInput.value.trim();
     if (!name) return;
+    const phone = newTeacherPhoneInput.value.trim();
     addTeacherBtn.disabled = true;
     try {
       await authReady;
-      await db.collection("teachers").add({ name, createdAt: Date.now() });
+      const doc = { name, createdAt: Date.now() };
+      if (phone) doc.phone = phone;
+      await db.collection("teachers").add(doc);
       newTeacherInput.value = "";
+      newTeacherPhoneInput.value = "";
     } catch (e) {
       adminStatusLine.textContent = "Could not add teacher, please try again.";
       console.error(e);
@@ -1518,6 +1651,7 @@
         attendanceByDate.get(rec.date).set(rec.teacherId, rec);
       }
       renderRoster();
+      if (!adminPanel.hidden) renderReportSummary();
     },
     (err) => console.error(err)
   );
