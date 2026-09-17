@@ -143,6 +143,34 @@
   .install-btn:hover, .admin-btn:hover { background: var(--accent-soft); color: var(--ink); }
   .admin-btn.on { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
 
+  /* ---------- member strip ---------- */
+
+  .member-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 20px;
+    background: var(--accent-soft);
+    border-bottom: 1px solid var(--line);
+    font-size: 12.5px;
+  }
+
+  .member-strip .who { color: var(--ink-soft); }
+  .member-strip .who strong { color: var(--ink); font-weight: 600; }
+
+  .member-strip button {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 2px 4px;
+    font-family: "Work Sans", system-ui, sans-serif;
+  }
+
+  .member-strip button:hover { text-decoration: underline; }
+
   /* ---------- date bar ---------- */
 
   .date-bar {
@@ -647,7 +675,7 @@
 
   @media (max-width: 460px) {
     .app { border-inline: none; }
-    header, .date-bar, .summary, .roster { padding-left: 16px; padding-right: 16px; }
+    header, .member-strip, .date-bar, .summary, .roster { padding-left: 16px; padding-right: 16px; }
   }
 </style>
 </head>
@@ -669,6 +697,11 @@
     <div class="subhead">Track when each teacher arrives and leaves, in real time.</div>
   </header>
 
+  <div class="member-strip" id="member-strip" hidden>
+    <span class="who">Signed in as <strong id="member-name"></strong></span>
+    <button id="switch-identity-btn" type="button">Not you?</button>
+  </div>
+
   <div class="date-bar">
     <div class="field">
       <label for="date-picker">Date</label>
@@ -677,7 +710,7 @@
     <button class="today-btn" id="today-btn" type="button">Today</button>
   </div>
 
-  <div class="summary">
+  <div class="summary" id="summary-tiles">
     <div class="stat-tile present">
       <div class="label">Checked In</div>
       <div class="value" id="stat-present">0</div>
@@ -722,6 +755,14 @@
       </div>
       <button class="back-link" id="action-back-btn" type="button">&larr; Not you? Pick another name</button>
     </div>
+  </div>
+</div>
+
+<div class="panel" id="identity-panel" hidden>
+  <div class="panel-card">
+    <h2>Who are you?</h2>
+    <p>Pick your name to see your own attendance and check in or out.</p>
+    <div class="teacher-grid" id="identity-teacher-grid"></div>
   </div>
 </div>
 
@@ -804,6 +845,7 @@
 
   const ADMIN_PIN = "2580";
   const ADMIN_SESSION_KEY = "rowda-attendance-admin";
+  const MY_TEACHER_KEY = "rowda-attendance-my-teacher-id";
 
   // ---------- DOM refs ----------
   const installBtn = document.getElementById("install-btn");
@@ -813,9 +855,16 @@
   const statPresent = document.getElementById("stat-present");
   const statLate = document.getElementById("stat-late");
   const statAbsent = document.getElementById("stat-absent");
+  const summaryTiles = document.getElementById("summary-tiles");
   const openCheckinBtn = document.getElementById("open-checkin-btn");
   const roster = document.getElementById("roster");
   const emptyState = document.getElementById("empty-state");
+
+  const memberStrip = document.getElementById("member-strip");
+  const memberName = document.getElementById("member-name");
+  const switchIdentityBtn = document.getElementById("switch-identity-btn");
+  const identityPanel = document.getElementById("identity-panel");
+  const identityTeacherGrid = document.getElementById("identity-teacher-grid");
 
   const checkinPanel = document.getElementById("checkin-panel");
   const checkinCloseBtn = document.getElementById("checkin-close-btn");
@@ -855,6 +904,11 @@
   let settings = { startTime: "08:00" };
   let selectedTeacher = null;
   let isAdmin = sessionStorage.getItem(ADMIN_SESSION_KEY) === "1";
+  let myTeacherId = localStorage.getItem(MY_TEACHER_KEY);
+
+  function getMyTeacher() {
+    return teachers.find((t) => t.id === myTeacherId) || null;
+  }
 
   function dayKey(ts) {
     const d = new Date(ts);
@@ -982,11 +1036,18 @@
   }
 
   function renderRoster() {
+    summaryTiles.hidden = !isAdmin;
+
     const dateKey = selectedDateKey();
     roster.innerHTML = "";
 
-    if (teachers.length === 0) {
+    const visibleTeachers = isAdmin ? teachers : (getMyTeacher() ? [getMyTeacher()] : []);
+
+    if (visibleTeachers.length === 0) {
       roster.appendChild(emptyState);
+      emptyState.querySelector("p").textContent = isAdmin
+        ? "No teachers added yet. Open Admin to add your teaching staff."
+        : "No teachers added yet. Ask your admin to add you to the staff list.";
       statPresent.textContent = "0";
       statLate.textContent = "0";
       statAbsent.textContent = "0";
@@ -997,7 +1058,7 @@
     let late = 0;
     let absent = 0;
 
-    const sorted = teachers.slice().sort((a, b) => a.name.localeCompare(b.name));
+    const sorted = visibleTeachers.slice().sort((a, b) => a.name.localeCompare(b.name));
     for (const t of sorted) {
       const rec = attendanceRecordFor(t.id, dateKey);
       const status = statusForRecord(rec);
@@ -1036,6 +1097,14 @@
 
   // ---------- check-in kiosk ----------
   function openCheckinPanel() {
+    if (!isAdmin) {
+      const me = getMyTeacher();
+      if (me) {
+        selectTeacherForCheckin(me);
+        checkinPanel.hidden = false;
+        return;
+      }
+    }
     checkinPickView.hidden = false;
     checkinActionView.hidden = true;
     checkinTeacherGrid.innerHTML = "";
@@ -1055,6 +1124,7 @@
     selectedTeacher = teacher;
     checkinPickView.hidden = true;
     checkinActionView.hidden = false;
+    actionBackBtn.hidden = !isAdmin;
     actionStatusLine.textContent = "";
     actionTeacherName.textContent = teacher.name;
     const rec = attendanceRecordFor(teacher.id, todayKey());
@@ -1133,6 +1203,55 @@
   openCheckinBtn.addEventListener("click", openCheckinPanel);
   checkinCloseBtn.addEventListener("click", () => { checkinPanel.hidden = true; });
 
+  // ---------- identity (which teacher is "me" on this device) ----------
+  function renderIdentityGrid() {
+    identityTeacherGrid.innerHTML = "";
+    const sorted = teachers.slice().sort((a, b) => a.name.localeCompare(b.name));
+    for (const t of sorted) {
+      const btn = document.createElement("button");
+      btn.className = "teacher-pick-btn";
+      btn.type = "button";
+      btn.textContent = t.name;
+      btn.addEventListener("click", () => {
+        myTeacherId = t.id;
+        localStorage.setItem(MY_TEACHER_KEY, t.id);
+        identityPanel.hidden = true;
+        updateIdentityUI();
+      });
+      identityTeacherGrid.appendChild(btn);
+    }
+  }
+
+  function updateIdentityUI() {
+    if (isAdmin) {
+      memberStrip.hidden = true;
+      identityPanel.hidden = true;
+      renderRoster();
+      return;
+    }
+    const me = getMyTeacher();
+    if (me) {
+      memberStrip.hidden = false;
+      memberName.textContent = me.name;
+      identityPanel.hidden = true;
+    } else {
+      memberStrip.hidden = true;
+      myTeacherId = null;
+      localStorage.removeItem(MY_TEACHER_KEY);
+      if (teachers.length > 0) {
+        renderIdentityGrid();
+        identityPanel.hidden = false;
+      }
+    }
+    renderRoster();
+  }
+
+  switchIdentityBtn.addEventListener("click", () => {
+    myTeacherId = null;
+    localStorage.removeItem(MY_TEACHER_KEY);
+    updateIdentityUI();
+  });
+
   // ---------- admin unlock ----------
   function updateAdminBtn() {
     adminBtn.classList.toggle("on", isAdmin);
@@ -1156,6 +1275,7 @@
       isAdmin = true;
       sessionStorage.setItem(ADMIN_SESSION_KEY, "1");
       updateAdminBtn();
+      updateIdentityUI();
       pinPanel.hidden = true;
       openAdminPanel();
     } else {
@@ -1311,7 +1431,7 @@
   db.collection("teachers").orderBy("createdAt", "asc").onSnapshot(
     (snap) => {
       teachers = snap.docs.map((d) => Object.assign({ id: d.id }, d.data()));
-      renderRoster();
+      updateIdentityUI();
       if (!adminPanel.hidden) renderTeacherManageList();
     },
     (err) => console.error(err)
@@ -1353,7 +1473,7 @@
   }
 
   updateAdminBtn();
-  renderRoster();
+  updateIdentityUI();
 })();
 </script>
 </body>
