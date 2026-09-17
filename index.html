@@ -545,7 +545,28 @@
     font-weight: 600;
     font-size: 13px;
     cursor: pointer;
+    white-space: nowrap;
   }
+
+  .location-status {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin: 0 0 10px;
+  }
+
+  .location-status.set { color: var(--accent); }
+
+  .clear-location-btn {
+    margin-top: 8px;
+    background: none;
+    border: none;
+    color: var(--ink-soft);
+    font-size: 12px;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .clear-location-btn:hover { color: var(--bad); }
 
   .field {
     display: flex;
@@ -682,7 +703,7 @@
   <div class="panel-card">
     <button class="panel-close" id="admin-close-btn" type="button" title="Close" aria-label="Close">&#10005;</button>
     <h2>Admin</h2>
-    <p>Manage your teaching staff and the school start time.</p>
+    <p>Manage your teaching staff, the school start time, and the check-in location.</p>
 
     <div class="admin-section">
       <h3>Teachers</h3>
@@ -702,6 +723,19 @@
         </div>
         <button id="save-start-time-btn" type="button">Save</button>
       </div>
+    </div>
+
+    <div class="admin-section">
+      <h3>School Location (Geofence)</h3>
+      <p class="location-status" id="location-status-line">Not set — teachers can check in from anywhere.</p>
+      <div class="settings-row">
+        <div class="field">
+          <label for="radius-input">Radius (meters)</label>
+          <input id="radius-input" type="number" inputmode="numeric" min="20" step="10" value="150" style="width:100px;">
+        </div>
+        <button id="use-my-location-btn" type="button">Use My Location</button>
+      </div>
+      <button class="clear-location-btn" id="clear-location-btn" type="button" hidden>Remove location requirement</button>
     </div>
 
     <div class="panel-status" id="admin-status-line"></div>
@@ -768,11 +802,15 @@
   const startTimeInput = document.getElementById("start-time-input");
   const saveStartTimeBtn = document.getElementById("save-start-time-btn");
   const adminStatusLine = document.getElementById("admin-status-line");
+  const locationStatusLine = document.getElementById("location-status-line");
+  const radiusInput = document.getElementById("radius-input");
+  const useMyLocationBtn = document.getElementById("use-my-location-btn");
+  const clearLocationBtn = document.getElementById("clear-location-btn");
 
   // ---------- state ----------
   let teachers = [];
   let attendanceByDate = new Map();
-  let settings = { startTime: "08:00" };
+  let settings = { startTime: "08:00", schoolLat: null, schoolLng: null, radiusMeters: 150 };
   let selectedTeacher = null;
   let isAdmin = sessionStorage.getItem(ADMIN_SESSION_KEY) === "1";
 
@@ -803,6 +841,58 @@
     const h = Math.floor(mins / 60);
     const m = mins % 60;
     return h + "h " + m + "m";
+  }
+
+  // ---------- geofencing ----------
+  function hasGeofence() {
+    return typeof settings.schoolLat === "number" && typeof settings.schoolLng === "number";
+  }
+
+  function distanceMeters(lat1, lng1, lat2, lng2) {
+    const R = 6371000;
+    const toRad = (d) => (d * Math.PI) / 180;
+    const dLat = toRad(lat2 - lat1);
+    const dLng = toRad(lng2 - lng1);
+    const a = Math.sin(dLat / 2) ** 2 +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  function getCurrentPosition(options) {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error("Geolocation is not supported on this device."));
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(resolve, reject, options);
+    });
+  }
+
+  function friendlyGeoError(err) {
+    if (err && err.code === 1) return "Location access was denied. Please allow location permission and try again.";
+    if (err && err.code === 2) return "Could not determine your location. Please try again.";
+    if (err && err.code === 3) return "Location request timed out. Please try again.";
+    return err && err.message ? err.message : "Could not verify your location.";
+  }
+
+  // Resolves { ok: true } if within range (or no geofence configured),
+  // or { ok: false, message } if the check-in should be blocked.
+  async function verifyAtSchool() {
+    if (!hasGeofence()) return { ok: true };
+    try {
+      const pos = await getCurrentPosition({ enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+      const dist = distanceMeters(
+        pos.coords.latitude, pos.coords.longitude,
+        settings.schoolLat, settings.schoolLng
+      );
+      const radius = settings.radiusMeters || 150;
+      if (dist > radius) {
+        return { ok: false, message: "You're " + Math.round(dist) + "m from school (limit " + radius + "m). Move closer and try again." };
+      }
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, message: friendlyGeoError(e) };
+    }
   }
 
   // ---------- install prompt ----------
@@ -951,6 +1041,17 @@
     const action = actionBtn.dataset.action;
     if (!action || !selectedTeacher) return;
     actionBtn.disabled = true;
+
+    if (hasGeofence()) {
+      actionStatusLine.textContent = "Checking your location...";
+      const check = await verifyAtSchool();
+      if (!check.ok) {
+        actionStatusLine.textContent = check.message;
+        actionBtn.disabled = false;
+        return;
+      }
+    }
+
     actionStatusLine.textContent = "Saving...";
     try {
       const cred = await authReady;
@@ -1032,9 +1133,23 @@
     }
   }
 
+  function renderLocationStatus() {
+    if (hasGeofence()) {
+      locationStatusLine.textContent = "Set — teachers must be within " + (settings.radiusMeters || 150) + "m of school to check in or out.";
+      locationStatusLine.classList.add("set");
+      clearLocationBtn.hidden = false;
+      radiusInput.value = settings.radiusMeters || 150;
+    } else {
+      locationStatusLine.textContent = "Not set — teachers can check in from anywhere.";
+      locationStatusLine.classList.remove("set");
+      clearLocationBtn.hidden = true;
+    }
+  }
+
   function openAdminPanel() {
     renderTeacherManageList();
     startTimeInput.value = settings.startTime || "08:00";
+    renderLocationStatus();
     adminStatusLine.textContent = "";
     adminPanel.hidden = false;
   }
@@ -1082,6 +1197,38 @@
     saveStartTimeBtn.disabled = false;
   });
 
+  useMyLocationBtn.addEventListener("click", async () => {
+    const radius = parseInt(radiusInput.value, 10) || 150;
+    useMyLocationBtn.disabled = true;
+    adminStatusLine.textContent = "Getting your current location...";
+    try {
+      const pos = await getCurrentPosition({ enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+      await authReady;
+      await db.collection("settings").doc("config").set({
+        schoolLat: pos.coords.latitude,
+        schoolLng: pos.coords.longitude,
+        radiusMeters: radius,
+      }, { merge: true });
+      adminStatusLine.textContent = "School location saved from where you're standing.";
+    } catch (e) {
+      adminStatusLine.textContent = friendlyGeoError(e);
+      console.error(e);
+    }
+    useMyLocationBtn.disabled = false;
+  });
+
+  clearLocationBtn.addEventListener("click", async () => {
+    if (!confirm("Remove the location requirement? Teachers will be able to check in from anywhere again.")) return;
+    try {
+      await authReady;
+      await db.collection("settings").doc("config").set({ schoolLat: null, schoolLng: null }, { merge: true });
+      adminStatusLine.textContent = "Location requirement removed.";
+    } catch (e) {
+      adminStatusLine.textContent = "Could not update, please try again.";
+      console.error(e);
+    }
+  });
+
   // ---------- live data ----------
   db.collection("teachers").orderBy("createdAt", "asc").onSnapshot(
     (snap) => {
@@ -1107,8 +1254,9 @@
 
   db.collection("settings").doc("config").onSnapshot(
     (doc) => {
-      if (doc.exists) settings = Object.assign({ startTime: "08:00" }, doc.data());
+      if (doc.exists) settings = Object.assign({ startTime: "08:00", schoolLat: null, schoolLng: null, radiusMeters: 150 }, doc.data());
       renderRoster();
+      if (!adminPanel.hidden) renderLocationStatus();
     },
     (err) => console.error(err)
   );
