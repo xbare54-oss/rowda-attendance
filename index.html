@@ -432,6 +432,16 @@
 
   .teacher-pick-btn:hover { border-color: var(--accent); background: var(--accent-soft); }
 
+  .register-divider {
+    text-align: center;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 14px 0 10px;
+  }
+
   .action-status {
     text-align: center;
     padding: 8px 0;
@@ -763,6 +773,12 @@
     <h2>Who are you?</h2>
     <p>Pick your name to see your own attendance and check in or out.</p>
     <div class="teacher-grid" id="identity-teacher-grid"></div>
+    <div class="register-divider" id="register-divider">or register your name</div>
+    <div class="add-teacher-row">
+      <input id="register-name-input" type="text" placeholder="Type your full name" maxlength="60">
+      <button id="register-name-btn" type="button">Register</button>
+    </div>
+    <div class="panel-status" id="register-status-line"></div>
   </div>
 </div>
 
@@ -865,6 +881,10 @@
   const switchIdentityBtn = document.getElementById("switch-identity-btn");
   const identityPanel = document.getElementById("identity-panel");
   const identityTeacherGrid = document.getElementById("identity-teacher-grid");
+  const registerDivider = document.getElementById("register-divider");
+  const registerNameInput = document.getElementById("register-name-input");
+  const registerNameBtn = document.getElementById("register-name-btn");
+  const registerStatusLine = document.getElementById("register-status-line");
 
   const checkinPanel = document.getElementById("checkin-panel");
   const checkinCloseBtn = document.getElementById("checkin-close-btn");
@@ -1204,23 +1224,59 @@
   checkinCloseBtn.addEventListener("click", () => { checkinPanel.hidden = true; });
 
   // ---------- identity (which teacher is "me" on this device) ----------
+  // Claiming an identity (picking a name or self-registering) always exits
+  // admin mode on this device first — this is the one place a viewer's
+  // access level changes, so it must never leave a stale admin session behind.
+  function becomeTeacher(teacherId) {
+    isAdmin = false;
+    sessionStorage.removeItem(ADMIN_SESSION_KEY);
+    updateAdminBtn();
+    myTeacherId = teacherId;
+    localStorage.setItem(MY_TEACHER_KEY, teacherId);
+    identityPanel.hidden = true;
+    updateIdentityUI();
+  }
+
   function renderIdentityGrid() {
     identityTeacherGrid.innerHTML = "";
     const sorted = teachers.slice().sort((a, b) => a.name.localeCompare(b.name));
+    registerDivider.hidden = sorted.length === 0;
     for (const t of sorted) {
       const btn = document.createElement("button");
       btn.className = "teacher-pick-btn";
       btn.type = "button";
       btn.textContent = t.name;
-      btn.addEventListener("click", () => {
-        myTeacherId = t.id;
-        localStorage.setItem(MY_TEACHER_KEY, t.id);
-        identityPanel.hidden = true;
-        updateIdentityUI();
-      });
+      btn.addEventListener("click", () => becomeTeacher(t.id));
       identityTeacherGrid.appendChild(btn);
     }
   }
+
+  registerNameBtn.addEventListener("click", async () => {
+    const name = registerNameInput.value.trim();
+    if (!name) {
+      registerStatusLine.textContent = "Enter your name first.";
+      return;
+    }
+    const existing = teachers.find((t) => t.name.toLowerCase() === name.toLowerCase());
+    if (existing) {
+      becomeTeacher(existing.id);
+      return;
+    }
+    registerNameBtn.disabled = true;
+    registerStatusLine.textContent = "Registering...";
+    try {
+      await authReady;
+      const ref = await db.collection("teachers").add({ name, createdAt: Date.now() });
+      registerNameInput.value = "";
+      registerStatusLine.textContent = "";
+      becomeTeacher(ref.id);
+    } catch (e) {
+      registerStatusLine.textContent = "Could not register, please try again.";
+      console.error(e);
+    }
+    registerNameBtn.disabled = false;
+  });
+  registerNameInput.addEventListener("keydown", (e) => { if (e.key === "Enter") registerNameBtn.click(); });
 
   function updateIdentityUI() {
     if (isAdmin) {
@@ -1238,10 +1294,8 @@
       memberStrip.hidden = true;
       myTeacherId = null;
       localStorage.removeItem(MY_TEACHER_KEY);
-      if (teachers.length > 0) {
-        renderIdentityGrid();
-        identityPanel.hidden = false;
-      }
+      renderIdentityGrid();
+      identityPanel.hidden = false;
     }
     renderRoster();
   }
