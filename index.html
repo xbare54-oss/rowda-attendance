@@ -1,0 +1,1127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rowda Attendance</title>
+<meta name="description" content="Real-time teacher check-in and attendance tracking.">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1E6E52">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Rowda Attendance">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ground: #F5F1E7;
+    --surface: #FDFBF5;
+    --surface-raised: #FFFFFF;
+    --ink: #23281E;
+    --ink-soft: #5B5F51;
+    --line: #DFD8C4;
+    --accent: #1E6E52;
+    --accent-ink: #F5F1E7;
+    --accent-soft: #E4EDE5;
+    --warm: #B96E2C;
+    --warm-soft: #F3E4D2;
+    --bad: #B23A3A;
+    --bad-soft: #F5DEDE;
+    --shadow: 0 1px 2px rgba(35,40,30,0.06), 0 6px 16px -8px rgba(35,40,30,0.18);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #14180F;
+      --surface: #1B2116;
+      --surface-raised: #222A1B;
+      --ink: #EBE7D8;
+      --ink-soft: #A3A992;
+      --line: #333B28;
+      --accent: #4FAE86;
+      --accent-ink: #0E1710;
+      --accent-soft: #1E2E23;
+      --warm: #E0A05E;
+      --warm-soft: #2E2417;
+      --bad: #E27272;
+      --bad-soft: #3A1F1F;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 6px 20px -8px rgba(0,0,0,0.5);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #14180F;
+    --surface: #1B2116;
+    --surface-raised: #222A1B;
+    --ink: #EBE7D8;
+    --ink-soft: #A3A992;
+    --line: #333B28;
+    --accent: #4FAE86;
+    --accent-ink: #0E1710;
+    --accent-soft: #1E2E23;
+    --warm: #E0A05E;
+    --warm-soft: #2E2417;
+    --bad: #E27272;
+    --bad-soft: #3A1F1F;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 6px 20px -8px rgba(0,0,0,0.5);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Work Sans", system-ui, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 640px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border-inline: 1px solid var(--line);
+  }
+
+  header {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .eyebrow {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  h1 {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600;
+    font-size: 26px;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .subhead {
+    color: var(--ink-soft);
+    font-size: 13.5px;
+    margin-top: 4px;
+  }
+
+  .install-btn, .admin-btn {
+    flex: 0 0 auto;
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-family: "Work Sans", system-ui, sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 2px;
+  }
+
+  .install-btn:hover, .admin-btn:hover { background: var(--accent-soft); color: var(--ink); }
+  .admin-btn.on { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+
+  /* ---------- date bar ---------- */
+
+  .date-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .date-bar input[type="date"] {
+    font-family: "Work Sans", system-ui, sans-serif;
+    font-size: 13px;
+    color: var(--ink);
+    background: var(--surface-raised);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 8px 10px;
+  }
+
+  .today-btn {
+    height: 36px;
+    padding: 0 12px;
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: var(--ink-soft);
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: "Work Sans", system-ui, sans-serif;
+  }
+
+  .today-btn:hover { color: var(--ink); background: var(--accent-soft); }
+
+  /* ---------- summary ---------- */
+
+  .summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .stat-tile {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: var(--surface-raised);
+  }
+
+  .stat-tile .label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .stat-tile .value {
+    font-family: "IBM Plex Mono", monospace;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    font-size: 20px;
+    margin-top: 3px;
+  }
+
+  .stat-tile.present .value { color: var(--accent); }
+  .stat-tile.late .value { color: var(--warm); }
+  .stat-tile.absent .value { color: var(--bad); }
+
+  /* ---------- check-in button ---------- */
+
+  .checkin-cta {
+    margin: 16px 20px 0;
+    height: 48px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+  }
+
+  .checkin-cta:hover { filter: brightness(1.08); }
+
+  /* ---------- roster ---------- */
+
+  .roster {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 20px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .roster-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface-raised);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    box-shadow: var(--shadow);
+  }
+
+  .roster-main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .roster-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .roster-time {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    margin-top: 1px;
+  }
+
+  .status-pill {
+    flex: 0 0 auto;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 9px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .status-pill.not-arrived { background: var(--line); color: var(--ink-soft); }
+  .status-pill.on-time { background: var(--accent-soft); color: var(--accent); }
+  .status-pill.late { background: var(--warm-soft); color: var(--warm); }
+  .status-pill.checked-out { background: var(--accent-soft); color: var(--accent); }
+
+  .roster-delete {
+    flex: 0 0 auto;
+    background: none;
+    border: none;
+    color: var(--ink-soft);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 2px 4px;
+  }
+
+  .roster-delete:hover { color: var(--bad); }
+
+  .empty-state {
+    margin: auto;
+    text-align: center;
+    max-width: 300px;
+    padding: 32px 16px;
+    color: var(--ink-soft);
+  }
+
+  .empty-state .glyph {
+    font-family: "Fraunces", serif;
+    font-size: 34px;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .empty-state p { font-size: 13.5px; line-height: 1.5; margin: 4px 0 0; }
+
+  [hidden] { display: none !important; }
+
+  /* ---------- kiosk / check-in panel ---------- */
+
+  .panel {
+    position: fixed;
+    inset: 0;
+    background: color-mix(in srgb, var(--ink) 45%, transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 11;
+  }
+
+  .panel-card {
+    position: relative;
+    background: var(--surface-raised);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 24px;
+    max-width: 400px;
+    width: 100%;
+    max-height: 84vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow);
+  }
+
+  .panel-card h2 {
+    font-family: "Fraunces", serif;
+    font-size: 20px;
+    margin: 0 0 4px;
+  }
+
+  .panel-card > p {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin: 0 0 16px;
+  }
+
+  .panel-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    border-radius: 999px;
+    color: var(--ink-soft);
+    font-size: 16px;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  .panel-close:hover { background: var(--accent-soft); color: var(--ink); }
+
+  .teacher-grid {
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .teacher-pick-btn {
+    height: 44px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--surface-raised);
+    color: var(--ink);
+    font-family: "Work Sans", system-ui, sans-serif;
+    font-weight: 500;
+    font-size: 13.5px;
+    cursor: pointer;
+    padding: 0 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .teacher-pick-btn:hover { border-color: var(--accent); background: var(--accent-soft); }
+
+  .action-status {
+    text-align: center;
+    padding: 8px 0;
+  }
+
+  .action-status .name {
+    font-family: "Fraunces", serif;
+    font-size: 19px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .action-status .detail {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-bottom: 18px;
+  }
+
+  .action-btn {
+    width: 100%;
+    height: 46px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    color: var(--accent-ink);
+    background: var(--accent);
+  }
+
+  .action-btn.outcome { background: var(--warm); }
+  .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .back-link {
+    display: block;
+    text-align: center;
+    margin-top: 12px;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  .back-link:hover { color: var(--ink); }
+
+  .panel-status {
+    font-size: 12.5px;
+    color: var(--bad);
+    text-align: center;
+    min-height: 16px;
+    margin-top: 8px;
+  }
+
+  /* ---------- admin panel ---------- */
+
+  .admin-section {
+    margin-bottom: 18px;
+  }
+
+  .admin-section h3 {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 8px;
+  }
+
+  .add-teacher-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .add-teacher-row input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .add-teacher-row button {
+    flex: 0 0 auto;
+    background: var(--accent);
+    color: var(--accent-ink);
+    border: none;
+    border-radius: 8px;
+    padding: 0 14px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .teacher-manage-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 180px;
+    overflow-y: auto;
+  }
+
+  .teacher-manage-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 13.5px;
+  }
+
+  .teacher-manage-row button {
+    background: none;
+    border: none;
+    color: var(--ink-soft);
+    cursor: pointer;
+    font-size: 12.5px;
+  }
+
+  .teacher-manage-row button:hover { color: var(--bad); }
+
+  .settings-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+  }
+
+  .settings-row input[type="time"] {
+    flex: 0 0 auto;
+  }
+
+  .settings-row button {
+    height: 38px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    border: none;
+    border-radius: 8px;
+    padding: 0 14px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .field label {
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  input {
+    font-family: "Work Sans", system-ui, sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--surface-raised);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 9px 10px;
+  }
+
+  input:focus, button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  .pin-card input {
+    width: 100%;
+    text-align: center;
+    letter-spacing: 0.3em;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 20px;
+    margin-bottom: 12px;
+  }
+
+  .pin-card button.action-btn { margin-top: 4px; }
+
+  @media (max-width: 460px) {
+    .app { border-inline: none; }
+    header, .date-bar, .summary, .roster { padding-left: 16px; padding-right: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <header>
+    <div class="header-top">
+      <div>
+        <div class="eyebrow">School &middot; Daily Attendance</div>
+        <h1>Rowda Attendance</h1>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
+        <button class="install-btn" id="install-btn" type="button" hidden>Install App</button>
+        <button class="admin-btn" id="admin-btn" type="button">Admin</button>
+      </div>
+    </div>
+    <div class="subhead">Track when each teacher arrives and leaves, in real time.</div>
+  </header>
+
+  <div class="date-bar">
+    <div class="field">
+      <label for="date-picker">Date</label>
+      <input id="date-picker" type="date">
+    </div>
+    <button class="today-btn" id="today-btn" type="button">Today</button>
+  </div>
+
+  <div class="summary">
+    <div class="stat-tile present">
+      <div class="label">Checked In</div>
+      <div class="value" id="stat-present">0</div>
+    </div>
+    <div class="stat-tile late">
+      <div class="label">Late</div>
+      <div class="value" id="stat-late">0</div>
+    </div>
+    <div class="stat-tile absent">
+      <div class="label">Not Yet</div>
+      <div class="value" id="stat-absent">0</div>
+    </div>
+  </div>
+
+  <button class="checkin-cta" id="open-checkin-btn" type="button">Check In / Check Out</button>
+
+  <div class="roster" id="roster">
+    <div class="empty-state" id="empty-state">
+      <div class="glyph">&sect;</div>
+      <p>No teachers added yet. Open Admin to add your teaching staff.</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="panel" id="checkin-panel" hidden>
+  <div class="panel-card">
+    <button class="panel-close" id="checkin-close-btn" type="button" title="Close" aria-label="Close">&#10005;</button>
+
+    <div id="checkin-pick-view">
+      <h2>Who are you?</h2>
+      <p>Tap your name to check in or out.</p>
+      <div class="teacher-grid" id="checkin-teacher-grid"></div>
+    </div>
+
+    <div id="checkin-action-view" hidden>
+      <div class="action-status">
+        <div class="name" id="action-teacher-name"></div>
+        <div class="detail" id="action-detail"></div>
+        <button class="action-btn" id="action-btn" type="button"></button>
+        <div class="panel-status" id="action-status-line"></div>
+      </div>
+      <button class="back-link" id="action-back-btn" type="button">&larr; Not you? Pick another name</button>
+    </div>
+  </div>
+</div>
+
+<div class="panel" id="pin-panel" hidden>
+  <div class="panel-card pin-card">
+    <button class="panel-close" id="pin-close-btn" type="button" title="Close" aria-label="Close">&#10005;</button>
+    <h2>Admin PIN</h2>
+    <p>Enter the admin PIN to manage teachers and settings.</p>
+    <input id="pin-input" type="password" inputmode="numeric" placeholder="&bull;&bull;&bull;&bull;" maxlength="12">
+    <button class="action-btn" id="pin-submit-btn" type="button">Unlock</button>
+    <div class="panel-status" id="pin-status-line"></div>
+  </div>
+</div>
+
+<div class="panel" id="admin-panel" hidden>
+  <div class="panel-card">
+    <button class="panel-close" id="admin-close-btn" type="button" title="Close" aria-label="Close">&#10005;</button>
+    <h2>Admin</h2>
+    <p>Manage your teaching staff and the school start time.</p>
+
+    <div class="admin-section">
+      <h3>Teachers</h3>
+      <div class="add-teacher-row">
+        <input id="new-teacher-input" type="text" placeholder="Teacher's name" maxlength="60">
+        <button id="add-teacher-btn" type="button">Add</button>
+      </div>
+      <div class="teacher-manage-list" id="teacher-manage-list"></div>
+    </div>
+
+    <div class="admin-section">
+      <h3>School Start Time</h3>
+      <div class="settings-row">
+        <div class="field">
+          <label for="start-time-input">Start time</label>
+          <input id="start-time-input" type="time" value="08:00">
+        </div>
+        <button id="save-start-time-btn" type="button">Save</button>
+      </div>
+    </div>
+
+    <div class="panel-status" id="admin-status-line"></div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script>
+(function () {
+  const firebaseConfig = {
+    apiKey: "AIzaSyCzXUKmUuNMKtUFjp1D649poJN3xuhjK5A",
+    authDomain: "xisaabta-kooxda.firebaseapp.com",
+    projectId: "xisaabta-kooxda",
+    storageBucket: "xisaabta-kooxda.firebasestorage.app",
+    messagingSenderId: "676825911875",
+    appId: "1:676825911875:web:0b94b0342fd0689a843af6"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const auth = firebase.auth();
+  let myUid = null;
+  const authReady = auth.signInAnonymously().catch((e) => console.error("Anonymous sign-in failed", e));
+  auth.onAuthStateChanged((user) => { myUid = user ? user.uid : null; });
+
+  const ADMIN_PIN = "2580";
+  const ADMIN_SESSION_KEY = "rowda-attendance-admin";
+
+  // ---------- DOM refs ----------
+  const installBtn = document.getElementById("install-btn");
+  const adminBtn = document.getElementById("admin-btn");
+  const datePicker = document.getElementById("date-picker");
+  const todayBtn = document.getElementById("today-btn");
+  const statPresent = document.getElementById("stat-present");
+  const statLate = document.getElementById("stat-late");
+  const statAbsent = document.getElementById("stat-absent");
+  const openCheckinBtn = document.getElementById("open-checkin-btn");
+  const roster = document.getElementById("roster");
+  const emptyState = document.getElementById("empty-state");
+
+  const checkinPanel = document.getElementById("checkin-panel");
+  const checkinCloseBtn = document.getElementById("checkin-close-btn");
+  const checkinPickView = document.getElementById("checkin-pick-view");
+  const checkinTeacherGrid = document.getElementById("checkin-teacher-grid");
+  const checkinActionView = document.getElementById("checkin-action-view");
+  const actionTeacherName = document.getElementById("action-teacher-name");
+  const actionDetail = document.getElementById("action-detail");
+  const actionBtn = document.getElementById("action-btn");
+  const actionStatusLine = document.getElementById("action-status-line");
+  const actionBackBtn = document.getElementById("action-back-btn");
+
+  const pinPanel = document.getElementById("pin-panel");
+  const pinCloseBtn = document.getElementById("pin-close-btn");
+  const pinInput = document.getElementById("pin-input");
+  const pinSubmitBtn = document.getElementById("pin-submit-btn");
+  const pinStatusLine = document.getElementById("pin-status-line");
+
+  const adminPanel = document.getElementById("admin-panel");
+  const adminCloseBtn = document.getElementById("admin-close-btn");
+  const newTeacherInput = document.getElementById("new-teacher-input");
+  const addTeacherBtn = document.getElementById("add-teacher-btn");
+  const teacherManageList = document.getElementById("teacher-manage-list");
+  const startTimeInput = document.getElementById("start-time-input");
+  const saveStartTimeBtn = document.getElementById("save-start-time-btn");
+  const adminStatusLine = document.getElementById("admin-status-line");
+
+  // ---------- state ----------
+  let teachers = [];
+  let attendanceByDate = new Map();
+  let settings = { startTime: "08:00" };
+  let selectedTeacher = null;
+  let isAdmin = sessionStorage.getItem(ADMIN_SESSION_KEY) === "1";
+
+  function dayKey(ts) {
+    const d = new Date(ts);
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+
+  function todayKey() { return dayKey(Date.now()); }
+
+  function timeLabel(ts) {
+    return new Date(ts).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+  }
+
+  function selectedDateKey() {
+    return datePicker.value || todayKey();
+  }
+
+  function isLate(checkInAt) {
+    const d = new Date(checkInAt);
+    const [h, m] = (settings.startTime || "08:00").split(":").map(Number);
+    const startMs = new Date(d.getFullYear(), d.getMonth(), d.getDate(), h, m, 0, 0).getTime();
+    return checkInAt > startMs;
+  }
+
+  function hoursBetween(a, b) {
+    const mins = Math.round((b - a) / 60000);
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    return h + "h " + m + "m";
+  }
+
+  // ---------- install prompt ----------
+  let deferredInstallPrompt = null;
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    installBtn.hidden = false;
+  });
+  installBtn.addEventListener("click", async () => {
+    if (!deferredInstallPrompt) return;
+    installBtn.hidden = true;
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+  });
+  window.addEventListener("appinstalled", () => {
+    installBtn.hidden = true;
+    deferredInstallPrompt = null;
+  });
+
+  // ---------- date bar ----------
+  datePicker.value = todayKey();
+  datePicker.addEventListener("change", renderRoster);
+  todayBtn.addEventListener("click", () => {
+    datePicker.value = todayKey();
+    renderRoster();
+  });
+
+  // ---------- roster rendering ----------
+  function attendanceRecordFor(teacherId, dateKey) {
+    const dayMap = attendanceByDate.get(dateKey);
+    return dayMap ? dayMap.get(teacherId) : null;
+  }
+
+  function statusForRecord(rec) {
+    if (!rec || !rec.checkInAt) return { key: "not-arrived", label: "Not Arrived" };
+    if (rec.checkOutAt) return { key: "checked-out", label: "Checked Out" };
+    if (isLate(rec.checkInAt)) return { key: "late", label: "Late" };
+    return { key: "on-time", label: "On Time" };
+  }
+
+  function renderRoster() {
+    const dateKey = selectedDateKey();
+    roster.innerHTML = "";
+
+    if (teachers.length === 0) {
+      roster.appendChild(emptyState);
+      statPresent.textContent = "0";
+      statLate.textContent = "0";
+      statAbsent.textContent = "0";
+      return;
+    }
+
+    let present = 0;
+    let late = 0;
+    let absent = 0;
+
+    const sorted = teachers.slice().sort((a, b) => a.name.localeCompare(b.name));
+    for (const t of sorted) {
+      const rec = attendanceRecordFor(t.id, dateKey);
+      const status = statusForRecord(rec);
+      if (status.key === "not-arrived") absent++;
+      else { present++; if (status.key === "late") late++; }
+
+      const row = document.createElement("div");
+      row.className = "roster-row";
+      const main = document.createElement("div");
+      main.className = "roster-main";
+      const name = document.createElement("div");
+      name.className = "roster-name";
+      name.textContent = t.name;
+      main.appendChild(name);
+      if (rec && rec.checkInAt) {
+        const timeEl = document.createElement("div");
+        timeEl.className = "roster-time";
+        let text = "In " + timeLabel(rec.checkInAt);
+        if (rec.checkOutAt) text += " · Out " + timeLabel(rec.checkOutAt) + " · " + hoursBetween(rec.checkInAt, rec.checkOutAt);
+        timeEl.textContent = text;
+        main.appendChild(timeEl);
+      }
+      const pill = document.createElement("div");
+      pill.className = "status-pill " + status.key;
+      pill.textContent = status.label;
+      row.appendChild(main);
+      row.appendChild(pill);
+      roster.appendChild(row);
+    }
+
+    statPresent.textContent = String(present);
+    statLate.textContent = String(late);
+    statAbsent.textContent = String(absent);
+  }
+
+  // ---------- check-in kiosk ----------
+  function openCheckinPanel() {
+    checkinPickView.hidden = false;
+    checkinActionView.hidden = true;
+    checkinTeacherGrid.innerHTML = "";
+    const sorted = teachers.slice().sort((a, b) => a.name.localeCompare(b.name));
+    for (const t of sorted) {
+      const btn = document.createElement("button");
+      btn.className = "teacher-pick-btn";
+      btn.type = "button";
+      btn.textContent = t.name;
+      btn.addEventListener("click", () => selectTeacherForCheckin(t));
+      checkinTeacherGrid.appendChild(btn);
+    }
+    checkinPanel.hidden = false;
+  }
+
+  function selectTeacherForCheckin(teacher) {
+    selectedTeacher = teacher;
+    checkinPickView.hidden = true;
+    checkinActionView.hidden = false;
+    actionStatusLine.textContent = "";
+    actionTeacherName.textContent = teacher.name;
+    const rec = attendanceRecordFor(teacher.id, todayKey());
+    if (!rec || !rec.checkInAt) {
+      actionDetail.textContent = "You haven't checked in today.";
+      actionBtn.textContent = "Check In";
+      actionBtn.className = "action-btn";
+      actionBtn.disabled = false;
+      actionBtn.dataset.action = "in";
+    } else if (!rec.checkOutAt) {
+      actionDetail.textContent = "Checked in at " + timeLabel(rec.checkInAt) + ".";
+      actionBtn.textContent = "Check Out";
+      actionBtn.className = "action-btn outcome";
+      actionBtn.disabled = false;
+      actionBtn.dataset.action = "out";
+    } else {
+      actionDetail.textContent = "Done for today — in " + timeLabel(rec.checkInAt) + ", out " + timeLabel(rec.checkOutAt) + ".";
+      actionBtn.textContent = "Already Checked Out";
+      actionBtn.className = "action-btn";
+      actionBtn.disabled = true;
+      actionBtn.dataset.action = "";
+    }
+  }
+
+  actionBackBtn.addEventListener("click", () => {
+    checkinPickView.hidden = false;
+    checkinActionView.hidden = true;
+  });
+
+  actionBtn.addEventListener("click", async () => {
+    const action = actionBtn.dataset.action;
+    if (!action || !selectedTeacher) return;
+    actionBtn.disabled = true;
+    actionStatusLine.textContent = "Saving...";
+    try {
+      const cred = await authReady;
+      const uid = (cred && cred.user && cred.user.uid) || myUid || (auth.currentUser && auth.currentUser.uid);
+      if (!uid) throw new Error("no uid");
+      const dateKey = todayKey();
+      const docId = selectedTeacher.id + "_" + dateKey;
+      const ref = db.collection("attendance").doc(docId);
+      if (action === "in") {
+        await ref.set({
+          teacherId: selectedTeacher.id,
+          teacherName: selectedTeacher.name,
+          date: dateKey,
+          checkInAt: Date.now(),
+          checkOutAt: null,
+          ownerUid: uid,
+        });
+      } else {
+        await ref.update({ checkOutAt: Date.now() });
+      }
+      checkinPanel.hidden = true;
+    } catch (e) {
+      actionStatusLine.textContent = "Something went wrong, please try again.";
+      console.error(e);
+      actionBtn.disabled = false;
+    }
+  });
+
+  openCheckinBtn.addEventListener("click", openCheckinPanel);
+  checkinCloseBtn.addEventListener("click", () => { checkinPanel.hidden = true; });
+
+  // ---------- admin unlock ----------
+  function updateAdminBtn() {
+    adminBtn.classList.toggle("on", isAdmin);
+    adminBtn.textContent = isAdmin ? "Admin ✓" : "Admin";
+  }
+
+  adminBtn.addEventListener("click", () => {
+    if (isAdmin) {
+      openAdminPanel();
+    } else {
+      pinInput.value = "";
+      pinStatusLine.textContent = "";
+      pinPanel.hidden = false;
+      pinInput.focus();
+    }
+  });
+
+  pinCloseBtn.addEventListener("click", () => { pinPanel.hidden = true; });
+  pinSubmitBtn.addEventListener("click", () => {
+    if (pinInput.value === ADMIN_PIN) {
+      isAdmin = true;
+      sessionStorage.setItem(ADMIN_SESSION_KEY, "1");
+      updateAdminBtn();
+      pinPanel.hidden = true;
+      openAdminPanel();
+    } else {
+      pinStatusLine.textContent = "Incorrect PIN.";
+    }
+  });
+  pinInput.addEventListener("keydown", (e) => { if (e.key === "Enter") pinSubmitBtn.click(); });
+
+  // ---------- admin panel ----------
+  function renderTeacherManageList() {
+    teacherManageList.innerHTML = "";
+    const sorted = teachers.slice().sort((a, b) => a.name.localeCompare(b.name));
+    for (const t of sorted) {
+      const row = document.createElement("div");
+      row.className = "teacher-manage-row";
+      const name = document.createElement("span");
+      name.textContent = t.name;
+      const del = document.createElement("button");
+      del.type = "button";
+      del.textContent = "Remove";
+      del.addEventListener("click", () => removeTeacher(t));
+      row.appendChild(name);
+      row.appendChild(del);
+      teacherManageList.appendChild(row);
+    }
+  }
+
+  function openAdminPanel() {
+    renderTeacherManageList();
+    startTimeInput.value = settings.startTime || "08:00";
+    adminStatusLine.textContent = "";
+    adminPanel.hidden = false;
+  }
+
+  adminCloseBtn.addEventListener("click", () => { adminPanel.hidden = true; });
+
+  addTeacherBtn.addEventListener("click", async () => {
+    const name = newTeacherInput.value.trim();
+    if (!name) return;
+    addTeacherBtn.disabled = true;
+    try {
+      await authReady;
+      await db.collection("teachers").add({ name, createdAt: Date.now() });
+      newTeacherInput.value = "";
+    } catch (e) {
+      adminStatusLine.textContent = "Could not add teacher, please try again.";
+      console.error(e);
+    }
+    addTeacherBtn.disabled = false;
+  });
+  newTeacherInput.addEventListener("keydown", (e) => { if (e.key === "Enter") addTeacherBtn.click(); });
+
+  async function removeTeacher(teacher) {
+    if (!confirm('Remove "' + teacher.name + '" from the teacher list? Their past attendance records are kept.')) return;
+    try {
+      await db.collection("teachers").doc(teacher.id).delete();
+    } catch (e) {
+      adminStatusLine.textContent = "Could not remove teacher, please try again.";
+      console.error(e);
+    }
+  }
+
+  saveStartTimeBtn.addEventListener("click", async () => {
+    const val = startTimeInput.value;
+    if (!val) return;
+    saveStartTimeBtn.disabled = true;
+    try {
+      await authReady;
+      await db.collection("settings").doc("config").set({ startTime: val }, { merge: true });
+      adminStatusLine.textContent = "Saved.";
+    } catch (e) {
+      adminStatusLine.textContent = "Could not save, please try again.";
+      console.error(e);
+    }
+    saveStartTimeBtn.disabled = false;
+  });
+
+  // ---------- live data ----------
+  db.collection("teachers").orderBy("createdAt", "asc").onSnapshot(
+    (snap) => {
+      teachers = snap.docs.map((d) => Object.assign({ id: d.id }, d.data()));
+      renderRoster();
+      if (!adminPanel.hidden) renderTeacherManageList();
+    },
+    (err) => console.error(err)
+  );
+
+  db.collection("attendance").onSnapshot(
+    (snap) => {
+      attendanceByDate = new Map();
+      for (const doc of snap.docs) {
+        const rec = doc.data();
+        if (!attendanceByDate.has(rec.date)) attendanceByDate.set(rec.date, new Map());
+        attendanceByDate.get(rec.date).set(rec.teacherId, rec);
+      }
+      renderRoster();
+    },
+    (err) => console.error(err)
+  );
+
+  db.collection("settings").doc("config").onSnapshot(
+    (doc) => {
+      if (doc.exists) settings = Object.assign({ startTime: "08:00" }, doc.data());
+      renderRoster();
+    },
+    (err) => console.error(err)
+  );
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("sw.js").catch(() => {});
+    });
+  }
+
+  updateAdminBtn();
+  renderRoster();
+})();
+</script>
+</body>
+</html>
