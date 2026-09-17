@@ -787,9 +787,9 @@
 <div class="panel" id="identity-panel" hidden>
   <div class="panel-card">
     <h2>Register Your Name</h2>
-    <p>Type your full name to register. After that, you'll only ever see your own attendance on this device.</p>
+    <p>Type your full name (first, father's, and family name) to register. After that, you'll only ever see your own attendance on this device.</p>
     <div class="add-teacher-row">
-      <input id="register-name-input" type="text" placeholder="Type your full name" maxlength="60">
+      <input id="register-name-input" type="text" placeholder="e.g. Faarax Cali Nuur" maxlength="60">
       <button id="register-name-btn" type="button">Register</button>
     </div>
     <div class="panel-status" id="register-status-line"></div>
@@ -1251,10 +1251,18 @@
     updateIdentityUI();
   }
 
+  function isFullName(name) {
+    return name.split(/\s+/).filter(Boolean).length >= 3;
+  }
+
   registerNameBtn.addEventListener("click", async () => {
     const name = registerNameInput.value.trim();
     if (!name) {
       registerStatusLine.textContent = "Enter your name first.";
+      return;
+    }
+    if (!isFullName(name)) {
+      registerStatusLine.textContent = "Please enter your full name (first, father's, and family name).";
       return;
     }
     const existing = teachers.find((t) => t.name.toLowerCase() === name.toLowerCase());
