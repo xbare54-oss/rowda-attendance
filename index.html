@@ -523,6 +523,43 @@
     font-size: 12.5px;
   }
 
+  .branch-manage-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 160px;
+    overflow-y: auto;
+  }
+
+  .branch-manage-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 13px;
+  }
+
+  .branch-manage-row .branch-info { min-width: 0; }
+  .branch-manage-row .branch-name { font-weight: 600; }
+  .branch-manage-row .branch-radius {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+  }
+
+  .branch-manage-row button {
+    background: none;
+    border: none;
+    color: var(--ink-soft);
+    cursor: pointer;
+    font-size: 12.5px;
+    flex: 0 0 auto;
+  }
+
+  .branch-manage-row button:hover { color: var(--bad); }
+
   .teacher-manage-row button:hover { color: var(--bad); }
 
   .settings-row {
@@ -726,16 +763,19 @@
     </div>
 
     <div class="admin-section">
-      <h3>School Location (Geofence)</h3>
-      <p class="location-status" id="location-status-line">Not set — teachers can check in from anywhere.</p>
-      <div class="settings-row">
+      <h3>School Branches (Geofence)</h3>
+      <p class="location-status" id="location-status-line">No branches set — teachers can check in from anywhere.</p>
+      <div class="branch-manage-list" id="branch-manage-list"></div>
+      <div class="add-teacher-row" style="margin-top:10px;">
+        <input id="new-branch-input" type="text" placeholder="Branch name (e.g. Main Campus)" maxlength="60">
+      </div>
+      <div class="settings-row" style="margin-top:8px;">
         <div class="field">
           <label for="radius-input">Radius (meters)</label>
           <input id="radius-input" type="number" inputmode="numeric" min="20" step="10" value="150" style="width:100px;">
         </div>
-        <button id="use-my-location-btn" type="button">Use My Location</button>
+        <button id="use-my-location-btn" type="button">Add Branch at My Location</button>
       </div>
-      <button class="clear-location-btn" id="clear-location-btn" type="button" hidden>Remove location requirement</button>
     </div>
 
     <div class="panel-status" id="admin-status-line"></div>
@@ -805,12 +845,14 @@
   const locationStatusLine = document.getElementById("location-status-line");
   const radiusInput = document.getElementById("radius-input");
   const useMyLocationBtn = document.getElementById("use-my-location-btn");
-  const clearLocationBtn = document.getElementById("clear-location-btn");
+  const newBranchInput = document.getElementById("new-branch-input");
+  const branchManageList = document.getElementById("branch-manage-list");
 
   // ---------- state ----------
   let teachers = [];
+  let branches = [];
   let attendanceByDate = new Map();
-  let settings = { startTime: "08:00", schoolLat: null, schoolLng: null, radiusMeters: 150 };
+  let settings = { startTime: "08:00" };
   let selectedTeacher = null;
   let isAdmin = sessionStorage.getItem(ADMIN_SESSION_KEY) === "1";
 
@@ -845,7 +887,7 @@
 
   // ---------- geofencing ----------
   function hasGeofence() {
-    return typeof settings.schoolLat === "number" && typeof settings.schoolLng === "number";
+    return branches.length > 0;
   }
 
   function distanceMeters(lat1, lng1, lat2, lng2) {
@@ -875,21 +917,25 @@
     return err && err.message ? err.message : "Could not verify your location.";
   }
 
-  // Resolves { ok: true } if within range (or no geofence configured),
-  // or { ok: false, message } if the check-in should be blocked.
+  // Resolves { ok: true, branchName } if within range of any branch (or no
+  // geofence configured), or { ok: false, message } if check-in should be blocked.
   async function verifyAtSchool() {
-    if (!hasGeofence()) return { ok: true };
+    if (!hasGeofence()) return { ok: true, branchName: null };
     try {
       const pos = await getCurrentPosition({ enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
-      const dist = distanceMeters(
-        pos.coords.latitude, pos.coords.longitude,
-        settings.schoolLat, settings.schoolLng
-      );
-      const radius = settings.radiusMeters || 150;
-      if (dist > radius) {
-        return { ok: false, message: "You're " + Math.round(dist) + "m from school (limit " + radius + "m). Move closer and try again." };
+      let nearest = null;
+      for (const b of branches) {
+        const dist = distanceMeters(pos.coords.latitude, pos.coords.longitude, b.lat, b.lng);
+        if (!nearest || dist < nearest.dist) nearest = { branch: b, dist };
+        if (dist <= (b.radiusMeters || 150)) {
+          return { ok: true, branchName: b.name };
+        }
       }
-      return { ok: true };
+      const radius = nearest.branch.radiusMeters || 150;
+      return {
+        ok: false,
+        message: "You're " + Math.round(nearest.dist) + "m from the nearest branch (" + nearest.branch.name + ", limit " + radius + "m). Move closer and try again.",
+      };
     } catch (e) {
       return { ok: false, message: friendlyGeoError(e) };
     }
@@ -970,6 +1016,7 @@
         const timeEl = document.createElement("div");
         timeEl.className = "roster-time";
         let text = "In " + timeLabel(rec.checkInAt);
+        if (rec.branch) text += " at " + rec.branch;
         if (rec.checkOutAt) text += " · Out " + timeLabel(rec.checkOutAt) + " · " + hoursBetween(rec.checkInAt, rec.checkOutAt);
         timeEl.textContent = text;
         main.appendChild(timeEl);
@@ -1042,6 +1089,7 @@
     if (!action || !selectedTeacher) return;
     actionBtn.disabled = true;
 
+    let branchName = null;
     if (hasGeofence()) {
       actionStatusLine.textContent = "Checking your location...";
       const check = await verifyAtSchool();
@@ -1050,6 +1098,7 @@
         actionBtn.disabled = false;
         return;
       }
+      branchName = check.branchName;
     }
 
     actionStatusLine.textContent = "Saving...";
@@ -1067,6 +1116,7 @@
           date: dateKey,
           checkInAt: Date.now(),
           checkOutAt: null,
+          branch: branchName,
           ownerUid: uid,
         });
       } else {
@@ -1133,23 +1183,45 @@
     }
   }
 
-  function renderLocationStatus() {
-    if (hasGeofence()) {
-      locationStatusLine.textContent = "Set — teachers must be within " + (settings.radiusMeters || 150) + "m of school to check in or out.";
-      locationStatusLine.classList.add("set");
-      clearLocationBtn.hidden = false;
-      radiusInput.value = settings.radiusMeters || 150;
-    } else {
-      locationStatusLine.textContent = "Not set — teachers can check in from anywhere.";
+  function renderBranchManageList() {
+    if (branches.length === 0) {
+      locationStatusLine.textContent = "No branches set — teachers can check in from anywhere.";
       locationStatusLine.classList.remove("set");
-      clearLocationBtn.hidden = true;
+    } else {
+      locationStatusLine.textContent = branches.length === 1
+        ? "1 branch set — teachers must be near it to check in or out."
+        : branches.length + " branches set — teachers must be near one of them to check in or out.";
+      locationStatusLine.classList.add("set");
+    }
+    branchManageList.innerHTML = "";
+    const sorted = branches.slice().sort((a, b) => a.name.localeCompare(b.name));
+    for (const b of sorted) {
+      const row = document.createElement("div");
+      row.className = "branch-manage-row";
+      const info = document.createElement("div");
+      info.className = "branch-info";
+      const name = document.createElement("div");
+      name.className = "branch-name";
+      name.textContent = b.name;
+      const radius = document.createElement("div");
+      radius.className = "branch-radius";
+      radius.textContent = "Radius " + (b.radiusMeters || 150) + "m";
+      info.appendChild(name);
+      info.appendChild(radius);
+      const del = document.createElement("button");
+      del.type = "button";
+      del.textContent = "Remove";
+      del.addEventListener("click", () => removeBranch(b));
+      row.appendChild(info);
+      row.appendChild(del);
+      branchManageList.appendChild(row);
     }
   }
 
   function openAdminPanel() {
     renderTeacherManageList();
     startTimeInput.value = settings.startTime || "08:00";
-    renderLocationStatus();
+    renderBranchManageList();
     adminStatusLine.textContent = "";
     adminPanel.hidden = false;
   }
@@ -1198,18 +1270,26 @@
   });
 
   useMyLocationBtn.addEventListener("click", async () => {
+    const name = newBranchInput.value.trim();
+    if (!name) {
+      adminStatusLine.textContent = "Enter a branch name first.";
+      return;
+    }
     const radius = parseInt(radiusInput.value, 10) || 150;
     useMyLocationBtn.disabled = true;
     adminStatusLine.textContent = "Getting your current location...";
     try {
       const pos = await getCurrentPosition({ enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
       await authReady;
-      await db.collection("settings").doc("config").set({
-        schoolLat: pos.coords.latitude,
-        schoolLng: pos.coords.longitude,
+      await db.collection("branches").add({
+        name,
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude,
         radiusMeters: radius,
-      }, { merge: true });
-      adminStatusLine.textContent = "School location saved from where you're standing.";
+        createdAt: Date.now(),
+      });
+      newBranchInput.value = "";
+      adminStatusLine.textContent = '"' + name + '" saved from where you\'re standing.';
     } catch (e) {
       adminStatusLine.textContent = friendlyGeoError(e);
       console.error(e);
@@ -1217,17 +1297,15 @@
     useMyLocationBtn.disabled = false;
   });
 
-  clearLocationBtn.addEventListener("click", async () => {
-    if (!confirm("Remove the location requirement? Teachers will be able to check in from anywhere again.")) return;
+  async function removeBranch(branch) {
+    if (!confirm('Remove branch "' + branch.name + '"? Teachers will no longer be able to check in from there.')) return;
     try {
-      await authReady;
-      await db.collection("settings").doc("config").set({ schoolLat: null, schoolLng: null }, { merge: true });
-      adminStatusLine.textContent = "Location requirement removed.";
+      await db.collection("branches").doc(branch.id).delete();
     } catch (e) {
-      adminStatusLine.textContent = "Could not update, please try again.";
+      adminStatusLine.textContent = "Could not remove branch, please try again.";
       console.error(e);
     }
-  });
+  }
 
   // ---------- live data ----------
   db.collection("teachers").orderBy("createdAt", "asc").onSnapshot(
@@ -1252,11 +1330,18 @@
     (err) => console.error(err)
   );
 
+  db.collection("branches").orderBy("createdAt", "asc").onSnapshot(
+    (snap) => {
+      branches = snap.docs.map((d) => Object.assign({ id: d.id }, d.data()));
+      if (!adminPanel.hidden) renderBranchManageList();
+    },
+    (err) => console.error(err)
+  );
+
   db.collection("settings").doc("config").onSnapshot(
     (doc) => {
-      if (doc.exists) settings = Object.assign({ startTime: "08:00", schoolLat: null, schoolLng: null, radiusMeters: 150 }, doc.data());
+      if (doc.exists) settings = Object.assign({ startTime: "08:00" }, doc.data());
       renderRoster();
-      if (!adminPanel.hidden) renderLocationStatus();
     },
     (err) => console.error(err)
   );
