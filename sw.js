@@ -1,4 +1,4 @@
-const CACHE_NAME = "rowda-attendance-v1";
+const CACHE_NAME = "rowda-attendance-v2";
 const APP_SHELL = [
   "./",
   "./index.html",

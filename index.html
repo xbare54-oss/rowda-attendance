@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Rowda Attendance</title>
 <meta name="description" content="Real-time teacher check-in and attendance tracking.">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#1E6E52">
+<meta name="theme-color" content="#2563EB">
 <link rel="icon" href="icons/icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -15,694 +15,613 @@
 <meta name="apple-mobile-web-app-title" content="Rowda Attendance">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
+  /* ================= DESIGN SYSTEM ================= */
   :root {
-    --ground: #F5F1E7;
-    --surface: #FDFBF5;
-    --surface-raised: #FFFFFF;
-    --ink: #23281E;
-    --ink-soft: #5B5F51;
-    --line: #DFD8C4;
-    --accent: #1E6E52;
-    --accent-ink: #F5F1E7;
-    --accent-soft: #E4EDE5;
-    --warm: #B96E2C;
-    --warm-soft: #F3E4D2;
-    --bad: #B23A3A;
-    --bad-soft: #F5DEDE;
-    --shadow: 0 1px 2px rgba(35,40,30,0.06), 0 6px 16px -8px rgba(35,40,30,0.18);
+    --primary: #2563EB;
+    --primary-dark: #1D4ED8;
+    --primary-soft: #EFF6FF;
+    --primary-ink: #FFFFFF;
+
+    --bg: #F8FAFC;
+    --surface: #FFFFFF;
+    --surface-2: #F1F5F9;
+
+    --text: #0F172A;
+    --text-muted: #64748B;
+    --text-faint: #94A3B8;
+    --border: #E2E8F0;
+
+    --success: #16A34A;
+    --success-soft: #F0FDF4;
+    --warning: #F59E0B;
+    --warning-soft: #FFFBEB;
+    --danger: #DC2626;
+    --danger-soft: #FEF2F2;
+    --info: #0EA5E9;
+    --info-soft: #F0F9FF;
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+
+    --shadow-sm: 0 1px 2px rgba(15,23,42,0.05);
+    --shadow-md: 0 4px 16px -4px rgba(15,23,42,0.12), 0 2px 6px -3px rgba(15,23,42,0.08);
+    --shadow-lg: 0 16px 40px -12px rgba(15,23,42,0.22);
+
+    --font: "Inter", system-ui, -apple-system, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, monospace;
   }
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --ground: #14180F;
-      --surface: #1B2116;
-      --surface-raised: #222A1B;
-      --ink: #EBE7D8;
-      --ink-soft: #A3A992;
-      --line: #333B28;
-      --accent: #4FAE86;
-      --accent-ink: #0E1710;
-      --accent-soft: #1E2E23;
-      --warm: #E0A05E;
-      --warm-soft: #2E2417;
-      --bad: #E27272;
-      --bad-soft: #3A1F1F;
-      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 6px 20px -8px rgba(0,0,0,0.5);
+      --primary: #3B82F6;
+      --primary-dark: #60A5FA;
+      --primary-soft: #17233D;
+      --primary-ink: #F8FAFC;
+      --bg: #0F172A;
+      --surface: #111827;
+      --surface-2: #1A2333;
+      --text: #F8FAFC;
+      --text-muted: #94A3B8;
+      --text-faint: #64748B;
+      --border: #1E293B;
+      --success-soft: #0F2A1B;
+      --warning-soft: #2E2210;
+      --danger-soft: #2E1516;
+      --info-soft: #10222E;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+      --shadow-md: 0 4px 16px -4px rgba(0,0,0,0.5), 0 2px 6px -3px rgba(0,0,0,0.4);
+      --shadow-lg: 0 20px 48px -12px rgba(0,0,0,0.6);
     }
   }
 
   :root[data-theme="dark"] {
-    --ground: #14180F;
-    --surface: #1B2116;
-    --surface-raised: #222A1B;
-    --ink: #EBE7D8;
-    --ink-soft: #A3A992;
-    --line: #333B28;
-    --accent: #4FAE86;
-    --accent-ink: #0E1710;
-    --accent-soft: #1E2E23;
-    --warm: #E0A05E;
-    --warm-soft: #2E2417;
-    --bad: #E27272;
-    --bad-soft: #3A1F1F;
-    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 6px 20px -8px rgba(0,0,0,0.5);
+    --primary: #3B82F6;
+    --primary-dark: #60A5FA;
+    --primary-soft: #17233D;
+    --primary-ink: #F8FAFC;
+    --bg: #0F172A;
+    --surface: #111827;
+    --surface-2: #1A2333;
+    --text: #F8FAFC;
+    --text-muted: #94A3B8;
+    --text-faint: #64748B;
+    --border: #1E293B;
+    --success-soft: #0F2A1B;
+    --warning-soft: #2E2210;
+    --danger-soft: #2E1516;
+    --info-soft: #10222E;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+    --shadow-md: 0 4px 16px -4px rgba(0,0,0,0.5), 0 2px 6px -3px rgba(0,0,0,0.4);
+    --shadow-lg: 0 20px 48px -12px rgba(0,0,0,0.6);
   }
 
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
 
   body {
-    background: var(--ground);
-    color: var(--ink);
-    font-family: "Work Sans", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
     min-height: 100vh;
     display: flex;
     justify-content: center;
+    -webkit-font-smoothing: antialiased;
   }
+
+  .icon { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; display: block; }
+  .icon-sm { width: 14px; height: 14px; }
+  .icon-lg { width: 28px; height: 28px; }
+  .icon-xl { width: 40px; height: 40px; stroke-width: 1.6; }
+
+  [hidden] { display: none !important; }
+
+  button { font-family: var(--font); }
 
   .app {
     width: 100%;
-    max-width: 640px;
+    max-width: 720px;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background: var(--surface);
-    border-inline: 1px solid var(--line);
+    background: var(--bg);
   }
 
+  /* ---------- header ---------- */
   header {
-    padding: 20px 20px 16px;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .header-top {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    padding: 16px 20px;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: 12px;
   }
 
-  .eyebrow {
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-  }
-
-  h1 {
-    font-family: "Fraunces", Georgia, serif;
-    font-weight: 600;
-    font-size: 26px;
-    margin: 0;
-    text-wrap: balance;
-  }
-
-  .subhead {
-    color: var(--ink-soft);
-    font-size: 13.5px;
-    margin-top: 4px;
-  }
-
-  .install-btn, .admin-btn {
+  .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .brand-mark {
     flex: 0 0 auto;
-    background: none;
-    border: 1px solid var(--line);
-    color: var(--ink-soft);
-    border-radius: 8px;
-    padding: 7px 12px;
-    font-family: "Work Sans", system-ui, sans-serif;
-    font-size: 12.5px;
-    font-weight: 600;
+    width: 38px; height: 38px;
+    border-radius: 11px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: var(--shadow-sm);
+  }
+  .brand-mark .icon { stroke: #fff; width: 20px; height: 20px; }
+  .brand-text { min-width: 0; }
+  .brand-title { font-weight: 800; font-size: 16px; letter-spacing: -0.01em; line-height: 1.15; }
+  .brand-sub { font-size: 11.5px; color: var(--text-muted); font-weight: 500; }
+
+  .header-actions { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+
+  /* ---------- buttons ---------- */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    height: 38px; padding: 0 15px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font); font-weight: 600; font-size: 13.5px;
+    border: 1px solid transparent;
     cursor: pointer;
-    margin-top: 2px;
+    transition: background .15s ease, border-color .15s ease, color .15s ease, transform .1s ease, box-shadow .15s ease;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
   }
+  .btn:active { transform: scale(0.97); }
+  .btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+  .btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
-  .install-btn:hover, .admin-btn:hover { background: var(--accent-soft); color: var(--ink); }
-  .admin-btn.on { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+  .btn-primary { background: var(--primary); color: #fff; box-shadow: var(--shadow-sm); }
+  .btn-primary:hover:not(:disabled) { background: var(--primary-dark); }
 
-  /* ---------- member strip ---------- */
+  .btn-secondary { background: var(--surface-2); color: var(--text); }
+  .btn-secondary:hover:not(:disabled) { background: var(--border); }
 
-  .member-strip {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 9px 20px;
-    background: var(--accent-soft);
-    border-bottom: 1px solid var(--line);
-    font-size: 12.5px;
+  .btn-outline { background: transparent; color: var(--text); border-color: var(--border); }
+  .btn-outline:hover:not(:disabled) { background: var(--surface-2); }
+
+  .btn-ghost { background: transparent; color: var(--text-muted); }
+  .btn-ghost:hover:not(:disabled) { background: var(--surface-2); color: var(--text); }
+
+  .btn-success { background: var(--success); color: #fff; }
+  .btn-success:hover:not(:disabled) { filter: brightness(1.08); }
+
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn-danger:hover:not(:disabled) { filter: brightness(1.08); }
+
+  .btn-danger-outline { background: transparent; color: var(--danger); border-color: var(--border); }
+  .btn-danger-outline:hover:not(:disabled) { background: var(--danger-soft); border-color: var(--danger); }
+
+  .btn-block { width: 100%; }
+  .btn-lg { height: 52px; font-size: 15.5px; border-radius: var(--radius-md); }
+  .btn-icon { width: 38px; height: 38px; padding: 0; flex: 0 0 auto; }
+
+  .btn .spinner { display: none; }
+  .btn.is-loading .spinner { display: inline-block; }
+  .btn.is-loading .btn-label { opacity: .001; position: absolute; }
+  .btn.is-loading { position: relative; color: transparent !important; }
+  .btn.is-loading .icon { display: none; }
+
+  .spinner {
+    width: 16px; height: 16px; border-radius: 999px;
+    border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff;
+    animation: spin .7s linear infinite;
+    position: absolute;
   }
+  .spinner.dark { border-color: color-mix(in srgb, var(--primary) 25%, transparent); border-top-color: var(--primary); }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
-  .member-strip .who { color: var(--ink-soft); }
-  .member-strip .who strong { color: var(--ink); font-weight: 600; }
-
-  .member-strip button {
-    background: none;
-    border: none;
-    color: var(--accent);
-    font-size: 12px;
-    font-weight: 600;
+  .admin-toggle {
+    display: inline-flex; align-items: center; gap: 6px;
+    height: 38px; padding: 0 13px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+    font-weight: 600; font-size: 12.5px;
     cursor: pointer;
-    padding: 2px 4px;
-    font-family: "Work Sans", system-ui, sans-serif;
+  }
+  .admin-toggle:hover { background: var(--surface-2); }
+  .admin-toggle.on { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
+
+  main { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 18px; }
+
+  @media (max-width: 460px) { header, main { padding-left: 16px; padding-right: 16px; } }
+
+  /* ---------- greeting ---------- */
+  .greeting-eyebrow {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase;
+    color: var(--text-faint); font-weight: 600; margin-bottom: 4px;
+  }
+  .greeting-title { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; }
+  .greeting-sub { font-size: 13.5px; color: var(--text-muted); margin-top: 3px; }
+
+  /* ---------- cards ---------- */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
   }
 
-  .member-strip button:hover { text-decoration: underline; }
+  /* ---------- stat grid ---------- */
+  .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  @media (min-width: 560px) { .stat-grid { grid-template-columns: repeat(4, 1fr); } }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px;
+    box-shadow: var(--shadow-sm);
+  }
+  .stat-icon {
+    width: 34px; height: 34px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 10px;
+  }
+  .stat-icon .icon { width: 17px; height: 17px; }
+  .stat-icon.blue { background: var(--primary-soft); color: var(--primary); }
+  .stat-icon.green { background: var(--success-soft); color: var(--success); }
+  .stat-icon.amber { background: var(--warning-soft); color: var(--warning); }
+  .stat-icon.red { background: var(--danger-soft); color: var(--danger); }
+
+  .stat-value { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
 
   /* ---------- date bar ---------- */
-
   .date-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 12px 20px;
-    border-bottom: 1px solid var(--line);
-    background: var(--surface);
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .date-field { position: relative; flex: 1; }
+  .date-field .icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
+  .date-field input[type="date"] {
+    width: 100%; height: 40px; padding: 0 12px 0 36px;
+    font-family: var(--font); font-size: 13.5px; font-weight: 500; color: var(--text);
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
   }
 
-  .date-bar input[type="date"] {
-    font-family: "Work Sans", system-ui, sans-serif;
-    font-size: 13px;
-    color: var(--ink);
-    background: var(--surface-raised);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 8px 10px;
+  /* ---------- generic inputs ---------- */
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+  .field .hint { font-size: 11.5px; color: var(--text-faint); }
+
+  input, select {
+    font-family: var(--font); font-size: 14.5px; color: var(--text);
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 10px 12px; width: 100%;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  input::placeholder { color: var(--text-faint); }
+  input:focus, select:focus, .action-btn:focus-visible {
+    outline: none; border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
+  }
+  input.field-error { border-color: var(--danger); }
+  input.field-error:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 18%, transparent); }
+  input:disabled { opacity: .6; }
+
+  .input-row { display: flex; gap: 8px; }
+  .input-row input { flex: 1; min-width: 0; }
+  .input-row-stack { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+
+  .error-text { font-size: 12px; color: var(--danger); font-weight: 500; min-height: 15px; }
+
+  /* ---------- hero check-in card (teacher) ---------- */
+  .hero-card {
+    background: linear-gradient(180deg, var(--surface), var(--surface));
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 28px 24px 24px;
+    box-shadow: var(--shadow-md);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-eyebrow {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase;
+    color: var(--text-faint); font-weight: 700; margin-bottom: 18px;
+  }
+  .hero-badge {
+    width: 76px; height: 76px; border-radius: 999px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 14px;
+  }
+  .hero-badge.pending { background: var(--surface-2); color: var(--text-faint); }
+  .hero-badge.present { background: var(--success-soft); color: var(--success); }
+  .hero-badge.late { background: var(--warning-soft); color: var(--warning); }
+  .hero-badge.done { background: var(--primary-soft); color: var(--primary); }
+  .hero-badge .icon { width: 34px; height: 34px; stroke-width: 1.8; }
+
+  .hero-status { font-size: 18px; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 2px; }
+  .hero-status.present { color: var(--success); }
+  .hero-status.late { color: var(--warning); }
+  .hero-time { font-family: var(--mono); font-size: 26px; font-weight: 700; letter-spacing: -0.01em; margin: 6px 0 4px; }
+  .hero-meta { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+  .hero-meta strong { color: var(--text); font-weight: 600; }
+
+  .hero-action { max-width: 320px; margin: 0 auto; }
+
+  .location-required {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 600; color: var(--info);
+    background: var(--info-soft); padding: 6px 12px; border-radius: 999px;
+    margin-bottom: 18px;
   }
 
-  .today-btn {
-    height: 36px;
-    padding: 0 12px;
-    background: none;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    color: var(--ink-soft);
-    font-size: 12.5px;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: "Work Sans", system-ui, sans-serif;
+  /* ---------- history ---------- */
+  .section-title {
+    font-size: 15px; font-weight: 700; letter-spacing: -0.01em;
+    display: flex; align-items: center; justify-content: space-between;
   }
+  .section-title .count { font-size: 12px; font-weight: 600; color: var(--text-faint); }
 
-  .today-btn:hover { color: var(--ink); background: var(--accent-soft); }
-
-  /* ---------- summary ---------- */
-
-  .summary {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--line);
+  .history-list { display: flex; flex-direction: column; gap: 8px; }
+  .history-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
+    padding: 12px 14px; display: flex; align-items: center; gap: 12px;
   }
+  .history-date { flex: 0 0 64px; }
+  .history-date .dow { font-size: 10.5px; font-weight: 700; color: var(--text-faint); text-transform: uppercase; letter-spacing: .04em; }
+  .history-date .num { font-size: 18px; font-weight: 800; line-height: 1.1; }
+  .history-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .history-times { font-family: var(--mono); font-size: 12.5px; color: var(--text-muted); }
+  .history-hours { font-size: 12px; color: var(--text-faint); font-weight: 500; }
 
-  .stat-tile {
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 10px 12px;
-    background: var(--surface-raised);
+  /* ---------- badges ---------- */
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 999px;
+    white-space: nowrap;
   }
-
-  .stat-tile .label {
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 10px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-  }
-
-  .stat-tile .value {
-    font-family: "IBM Plex Mono", monospace;
-    font-variant-numeric: tabular-nums;
-    font-weight: 600;
-    font-size: 20px;
-    margin-top: 3px;
-  }
-
-  .stat-tile.present .value { color: var(--accent); }
-  .stat-tile.late .value { color: var(--warm); }
-  .stat-tile.absent .value { color: var(--bad); }
-
-  /* ---------- check-in button ---------- */
-
-  .checkin-cta {
-    margin: 16px 20px 0;
-    height: 48px;
-    background: var(--accent);
-    color: var(--accent-ink);
-    border: none;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 15px;
-    cursor: pointer;
-  }
-
-  .checkin-cta:hover { filter: brightness(1.08); }
+  .badge .dot { width: 6px; height: 6px; border-radius: 999px; background: currentColor; flex: 0 0 auto; }
+  .badge-neutral { background: var(--surface-2); color: var(--text-muted); }
+  .badge-success { background: var(--success-soft); color: var(--success); }
+  .badge-warning { background: var(--warning-soft); color: var(--warning); }
+  .badge-danger { background: var(--danger-soft); color: var(--danger); }
+  .badge-info { background: var(--info-soft); color: var(--info); }
 
   /* ---------- roster ---------- */
-
-  .roster {
-    flex: 1;
-    overflow-y: auto;
-    padding: 16px 20px 28px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
+  .roster-list { display: flex; flex-direction: column; gap: 8px; }
   .roster-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: var(--surface-raised);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 10px 12px;
-    box-shadow: var(--shadow);
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
+    padding: 12px 14px;
+    transition: border-color .15s ease;
   }
-
-  .roster-main {
-    flex: 1;
-    min-width: 0;
+  .roster-avatar {
+    flex: 0 0 auto; width: 36px; height: 36px; border-radius: 999px;
+    background: var(--surface-2); color: var(--text-muted);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px;
   }
+  .roster-main { flex: 1; min-width: 0; }
+  .roster-name { font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .roster-time { font-family: var(--mono); font-size: 11.5px; color: var(--text-muted); margin-top: 1px; }
 
-  .roster-name {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--ink);
-  }
-
-  .roster-time {
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 11.5px;
-    color: var(--ink-soft);
-    margin-top: 1px;
-  }
-
-  .status-pill {
-    flex: 0 0 auto;
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 4px 9px;
-    border-radius: 999px;
-    white-space: nowrap;
-  }
-
-  .status-pill.not-arrived { background: var(--line); color: var(--ink-soft); }
-  .status-pill.on-time { background: var(--accent-soft); color: var(--accent); }
-  .status-pill.late { background: var(--warm-soft); color: var(--warm); }
-  .status-pill.checked-out { background: var(--accent-soft); color: var(--accent); }
-
-  .roster-delete {
-    flex: 0 0 auto;
-    background: none;
-    border: none;
-    color: var(--ink-soft);
-    font-size: 13px;
-    cursor: pointer;
-    padding: 2px 4px;
-  }
-
-  .roster-delete:hover { color: var(--bad); }
-
+  /* ---------- empty state ---------- */
   .empty-state {
-    margin: auto;
-    text-align: center;
-    max-width: 300px;
-    padding: 32px 16px;
-    color: var(--ink-soft);
+    text-align: center; padding: 44px 20px; color: var(--text-muted);
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
   }
-
-  .empty-state .glyph {
-    font-family: "Fraunces", serif;
-    font-size: 34px;
-    color: var(--accent);
-    margin-bottom: 8px;
+  .empty-icon {
+    width: 52px; height: 52px; border-radius: 14px; background: var(--surface-2);
+    display: flex; align-items: center; justify-content: center; color: var(--text-faint);
   }
+  .empty-state h4 { margin: 0; font-size: 14.5px; font-weight: 700; color: var(--text); }
+  .empty-state p { font-size: 13px; line-height: 1.5; margin: 0; max-width: 280px; }
 
-  .empty-state p { font-size: 13.5px; line-height: 1.5; margin: 4px 0 0; }
-
-  [hidden] { display: none !important; }
-
-  /* ---------- kiosk / check-in panel ---------- */
-
-  .panel {
-    position: fixed;
-    inset: 0;
-    background: color-mix(in srgb, var(--ink) 45%, transparent);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    z-index: 11;
+  /* ---------- modals / panels ---------- */
+  .panel-overlay {
+    position: fixed; inset: 0; z-index: 30;
+    background: rgba(15,23,42,0.5);
+    display: flex; align-items: flex-end; justify-content: center;
+    padding: 0;
+    animation: fade-in .15s ease;
   }
+  @media (min-width: 640px) { .panel-overlay { align-items: center; padding: 20px; } }
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 
-  .panel-card {
+  .panel-sheet {
     position: relative;
-    background: var(--surface-raised);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 24px;
-    max-width: 400px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    padding: 22px 20px 26px;
     width: 100%;
-    max-height: 84vh;
-    display: flex;
-    flex-direction: column;
-    box-shadow: var(--shadow);
+    max-width: 420px;
+    max-height: 88vh;
+    display: flex; flex-direction: column;
+    box-shadow: var(--shadow-lg);
+    animation: sheet-up .2s cubic-bezier(.2,.8,.3,1);
   }
+  @media (min-width: 640px) {
+    .panel-sheet { border-radius: var(--radius-xl); animation: pop-in .16s cubic-bezier(.2,.8,.3,1); }
+  }
+  @keyframes sheet-up { from { transform: translateY(16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes pop-in { from { transform: scale(.97) translateY(6px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
 
-  .panel-card h2 {
-    font-family: "Fraunces", serif;
-    font-size: 20px;
-    margin: 0 0 4px;
-  }
+  .panel-sheet.wide { max-width: 640px; }
 
-  .panel-card > p {
-    font-size: 13px;
-    color: var(--ink-soft);
-    margin: 0 0 16px;
-  }
+  .panel-sheet h2 { font-size: 18px; font-weight: 800; letter-spacing: -0.01em; margin: 0 0 4px; }
+  .panel-sheet > p.panel-desc { font-size: 13px; color: var(--text-muted); margin: 0 0 18px; line-height: 1.5; }
 
   .panel-close {
-    position: absolute;
-    top: 14px;
-    right: 14px;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: none;
-    border: none;
-    border-radius: 999px;
-    color: var(--ink-soft);
-    font-size: 16px;
-    cursor: pointer;
-    line-height: 1;
+    position: absolute; top: 16px; right: 16px;
+    width: 30px; height: 30px; border-radius: 999px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--surface-2); border: none; color: var(--text-muted); cursor: pointer;
   }
-
-  .panel-close:hover { background: var(--accent-soft); color: var(--ink); }
+  .panel-close:hover { background: var(--border); color: var(--text); }
 
   .teacher-grid {
-    overflow-y: auto;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-    margin-bottom: 4px;
+    overflow-y: auto; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 4px;
   }
-
   .teacher-pick-btn {
-    height: 44px;
-    border-radius: 8px;
-    border: 1px solid var(--line);
-    background: var(--surface-raised);
-    color: var(--ink);
-    font-family: "Work Sans", system-ui, sans-serif;
-    font-weight: 500;
-    font-size: 13.5px;
-    cursor: pointer;
-    padding: 0 8px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    height: 46px; border-radius: var(--radius-sm); border: 1px solid var(--border);
+    background: var(--surface); color: var(--text); font-weight: 600; font-size: 13px;
+    cursor: pointer; padding: 0 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
-
-  .teacher-pick-btn:hover { border-color: var(--accent); background: var(--accent-soft); }
-
-  .register-divider {
-    text-align: center;
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 10.5px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-    margin: 14px 0 10px;
-  }
-
-  .action-status {
-    text-align: center;
-    padding: 8px 0;
-  }
-
-  .action-status .name {
-    font-family: "Fraunces", serif;
-    font-size: 19px;
-    font-weight: 600;
-    margin-bottom: 6px;
-  }
-
-  .action-status .detail {
-    font-size: 13px;
-    color: var(--ink-soft);
-    margin-bottom: 18px;
-  }
-
-  .action-btn {
-    width: 100%;
-    height: 46px;
-    border: none;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 15px;
-    cursor: pointer;
-    color: var(--accent-ink);
-    background: var(--accent);
-  }
-
-  .action-btn.outcome { background: var(--warm); }
-  .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .teacher-pick-btn:hover { border-color: var(--primary); background: var(--primary-soft); }
 
   .back-link {
-    display: block;
-    text-align: center;
-    margin-top: 12px;
-    font-size: 12.5px;
-    color: var(--ink-soft);
-    background: none;
-    border: none;
-    cursor: pointer;
-    width: 100%;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    margin-top: 14px; font-size: 13px; font-weight: 600; color: var(--text-muted);
+    background: none; border: none; cursor: pointer; width: 100%; padding: 6px;
   }
+  .back-link:hover { color: var(--text); }
 
-  .back-link:hover { color: var(--ink); }
-
-  .panel-status {
-    font-size: 12.5px;
-    color: var(--bad);
-    text-align: center;
-    min-height: 16px;
-    margin-top: 8px;
+  /* ---------- verify flow ---------- */
+  .verify-steps { display: flex; flex-direction: column; gap: 4px; margin: 8px 0 20px; }
+  .verify-step {
+    display: flex; align-items: center; gap: 12px; padding: 10px 4px;
+    opacity: .4; transition: opacity .2s ease;
   }
+  .verify-step.active, .verify-step.done { opacity: 1; }
+  .verify-step-dot {
+    width: 26px; height: 26px; border-radius: 999px; flex: 0 0 auto;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--surface-2); color: var(--text-faint);
+    transition: background .2s ease, color .2s ease;
+  }
+  .verify-step.active .verify-step-dot { background: var(--primary-soft); color: var(--primary); }
+  .verify-step.active .verify-step-dot .spinner { position: static; }
+  .verify-step.done .verify-step-dot { background: var(--success-soft); color: var(--success); }
+  .verify-step-label { font-size: 13.5px; font-weight: 600; color: var(--text); }
+  .verify-step:not(.active):not(.done) .verify-step-label { color: var(--text-faint); }
 
-  /* ---------- admin panel ---------- */
+  .result-icon-wrap {
+    width: 64px; height: 64px; border-radius: 999px; margin: 6px auto 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .result-icon-wrap.success { background: var(--success-soft); color: var(--success); }
+  .result-icon-wrap.error { background: var(--danger-soft); color: var(--danger); }
+  .result-icon-wrap .icon { width: 32px; height: 32px; stroke-width: 1.8; }
+  .result-title { text-align: center; font-size: 17px; font-weight: 800; margin-bottom: 4px; }
+  .result-detail { text-align: center; font-size: 13.5px; color: var(--text-muted); line-height: 1.5; margin-bottom: 22px; }
+  .result-detail strong { color: var(--text); }
 
-  .admin-section {
-    margin-bottom: 18px;
+  .location-card {
+    background: var(--surface-2); border-radius: var(--radius-md); padding: 14px; margin-bottom: 18px;
+  }
+  .location-card-row { display: flex; align-items: center; justify-content: space-between; padding: 5px 0; font-size: 12.5px; }
+  .location-card-row .k { color: var(--text-muted); font-weight: 500; }
+  .location-card-row .v { font-weight: 700; font-family: var(--mono); }
+
+  /* ---------- confirm modal ---------- */
+  .confirm-icon-wrap {
+    width: 48px; height: 48px; border-radius: 12px; margin-bottom: 14px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--danger-soft); color: var(--danger);
+  }
+  .confirm-actions { display: flex; gap: 10px; margin-top: 18px; }
+  .confirm-actions .btn { flex: 1; }
+
+  /* ---------- toasts ---------- */
+  .toast-stack {
+    position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
+    z-index: 50; display: flex; flex-direction: column-reverse; gap: 8px;
+    width: calc(100% - 32px); max-width: 380px; pointer-events: none;
+  }
+  .toast {
+    pointer-events: auto;
+    display: flex; align-items: flex-start; gap: 10px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg); padding: 12px 14px;
+    animation: toast-in .22s cubic-bezier(.2,.8,.3,1);
+  }
+  @keyframes toast-in { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .toast.leaving { animation: toast-out .18s ease forwards; }
+  @keyframes toast-out { to { transform: translateY(6px); opacity: 0; } }
+  .toast-icon { flex: 0 0 auto; width: 30px; height: 30px; border-radius: 999px; display: flex; align-items: center; justify-content: center; }
+  .toast.success .toast-icon { background: var(--success-soft); color: var(--success); }
+  .toast.error .toast-icon { background: var(--danger-soft); color: var(--danger); }
+  .toast.warning .toast-icon { background: var(--warning-soft); color: var(--warning); }
+  .toast.info .toast-icon { background: var(--info-soft); color: var(--info); }
+  .toast-body { flex: 1; min-width: 0; }
+  .toast-title { font-size: 13px; font-weight: 700; }
+  .toast-msg { font-size: 12px; color: var(--text-muted); margin-top: 1px; line-height: 1.4; }
+  .toast-close { flex: 0 0 auto; background: none; border: none; color: var(--text-faint); cursor: pointer; padding: 2px; }
+
+  /* ---------- admin management sheet ---------- */
+  .admin-sheet-body { display: flex; flex: 1; min-height: 0; gap: 0; margin: 0 -20px -26px; }
+  .admin-tabs {
+    flex: 0 0 auto; display: flex; overflow-x: auto; gap: 4px;
+    padding: 0 20px 14px; border-bottom: 1px solid var(--border);
+  }
+  .admin-tab {
+    display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+    padding: 8px 12px; border-radius: var(--radius-sm); border: none; background: none;
+    font-size: 13px; font-weight: 600; color: var(--text-muted); cursor: pointer;
+  }
+  .admin-tab:hover { background: var(--surface-2); color: var(--text); }
+  .admin-tab.active { background: var(--primary-soft); color: var(--primary); }
+  .admin-tab-panels { flex: 1; overflow-y: auto; padding: 18px 20px 8px; }
+  .admin-tab-panel { display: flex; flex-direction: column; gap: 16px; }
+
+  @media (min-width: 640px) {
+    .admin-sheet-body { flex-direction: row; }
+    .admin-tabs { flex-direction: column; overflow-x: visible; width: 168px; flex: 0 0 168px; border-bottom: none; border-right: 1px solid var(--border); padding: 4px 12px 16px 0; }
+    .admin-tab { justify-content: flex-start; }
+    .admin-tab-panels { padding: 4px 4px 4px 20px; }
   }
 
   .admin-section h3 {
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 11px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-    margin: 0 0 8px;
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.07em; text-transform: uppercase;
+    color: var(--text-faint); font-weight: 700; margin: 0 0 10px;
   }
 
-  .add-teacher-row {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 10px;
+  .manage-list { display: flex; flex-direction: column; gap: 6px; }
+  .manage-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13.5px;
   }
-
-  .add-teacher-row input {
-    flex: 1;
-    min-width: 0;
+  .manage-row .info { min-width: 0; }
+  .manage-row .name { font-weight: 600; }
+  .manage-row .sub { font-size: 11.5px; color: var(--text-faint); font-family: var(--mono); margin-top: 1px; }
+  .manage-row .icon-btn {
+    flex: 0 0 auto; background: none; border: none; color: var(--text-faint); cursor: pointer;
+    width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
   }
+  .manage-row .icon-btn:hover { background: var(--danger-soft); color: var(--danger); }
 
-  .add-teacher-row button {
-    flex: 0 0 auto;
-    background: var(--accent);
-    color: var(--accent-ink);
-    border: none;
-    border-radius: 8px;
-    padding: 0 14px;
-    font-weight: 600;
-    font-size: 13px;
-    cursor: pointer;
+  .settings-row { display: flex; align-items: flex-end; gap: 10px; }
+  .settings-row .field { flex: 1; }
+  .settings-row input[type="time"] { flex: 0 0 auto; }
+
+  .location-status-line {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 12.5px; color: var(--text-muted); font-weight: 500;
+    background: var(--surface-2); padding: 9px 12px; border-radius: var(--radius-sm); margin-bottom: 4px;
   }
+  .location-status-line.set { color: var(--success); background: var(--success-soft); }
 
-  .teacher-manage-list {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    max-height: 180px;
-    overflow-y: auto;
-  }
+  .exit-admin-btn { margin-top: 4px; }
 
-  .teacher-manage-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 7px 10px;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    font-size: 13.5px;
-  }
+  .report-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; }
+  .report-row .name { font-weight: 600; }
+  .report-row .stats { font-size: 11.5px; color: var(--text-muted); font-family: var(--mono); }
 
-  .teacher-manage-row button {
-    background: none;
-    border: none;
-    color: var(--ink-soft);
-    cursor: pointer;
+  /* ---------- member strip ---------- */
+  .member-strip {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 10px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
     font-size: 12.5px;
   }
+  .member-strip .who { display: flex; align-items: center; gap: 9px; min-width: 0; color: var(--text-muted); }
+  .member-strip .who strong { color: var(--text); font-weight: 700; }
+  .member-strip button { background: none; border: none; color: var(--primary); font-size: 12px; font-weight: 700; cursor: pointer; padding: 4px 6px; white-space: nowrap; }
+  .member-strip button:hover { text-decoration: underline; }
 
-  .branch-manage-list {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    max-height: 160px;
-    overflow-y: auto;
-  }
-
-  .branch-manage-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 7px 10px;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    font-size: 13px;
-  }
-
-  .branch-manage-row .branch-info { min-width: 0; }
-  .branch-manage-row .branch-name { font-weight: 600; }
-  .branch-manage-row .branch-radius {
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 11px;
-    color: var(--ink-soft);
-  }
-
-  .branch-manage-row button {
-    background: none;
-    border: none;
-    color: var(--ink-soft);
-    cursor: pointer;
-    font-size: 12.5px;
-    flex: 0 0 auto;
-  }
-
-  .branch-manage-row button:hover { color: var(--bad); }
-
-  .teacher-manage-row button:hover { color: var(--bad); }
-
-  .settings-row {
-    display: flex;
-    align-items: flex-end;
-    gap: 10px;
-  }
-
-  .settings-row input[type="time"] {
-    flex: 0 0 auto;
-  }
-
-  .settings-row button {
-    height: 38px;
-    background: var(--accent);
-    color: var(--accent-ink);
-    border: none;
-    border-radius: 8px;
-    padding: 0 14px;
-    font-weight: 600;
-    font-size: 13px;
-    cursor: pointer;
-    white-space: nowrap;
-  }
-
-  .location-status {
-    font-size: 12.5px;
-    color: var(--ink-soft);
-    margin: 0 0 10px;
-  }
-
-  .location-status.set { color: var(--accent); }
-
-  .clear-location-btn {
-    margin-top: 8px;
-    background: none;
-    border: none;
-    color: var(--ink-soft);
-    font-size: 12px;
-    cursor: pointer;
-    padding: 0;
-  }
-
-  .clear-location-btn:hover { color: var(--bad); }
-
-  .field {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-  }
-
-  .field label {
-    font-size: 10.5px;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-    font-family: "IBM Plex Mono", monospace;
-  }
-
-  input {
-    font-family: "Work Sans", system-ui, sans-serif;
-    font-size: 14px;
-    color: var(--ink);
-    background: var(--surface-raised);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 9px 10px;
-  }
-
-  input:focus, button:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 1px;
-  }
-
-  .pin-card input {
-    width: 100%;
-    text-align: center;
-    letter-spacing: 0.3em;
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 20px;
-    margin-bottom: 12px;
-  }
-
-  .pin-card button.action-btn { margin-top: 4px; }
-
-  .exit-admin-btn {
-    width: 100%;
-    height: 38px;
-    margin-top: 14px;
-    background: none;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    color: var(--bad);
-    font-size: 12.5px;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: "Work Sans", system-ui, sans-serif;
-  }
-
-  .exit-admin-btn:hover { background: var(--bad-soft); }
-
-  @media (max-width: 460px) {
-    .app { border-inline: none; }
-    header, .member-strip, .date-bar, .summary, .roster { padding-left: 16px; padding-right: 16px; }
-  }
+  /* ---------- skeleton ---------- */
+  .skeleton { background: linear-gradient(100deg, var(--surface-2) 30%, var(--border) 50%, var(--surface-2) 70%); background-size: 200% 100%; animation: shimmer 1.3s ease-in-out infinite; border-radius: var(--radius-md); }
+  @keyframes shimmer { from { background-position: 150% 0; } to { background-position: -50% 0; } }
 </style>
 </head>
 <body>
@@ -710,171 +629,342 @@
 <div class="app">
 
   <header>
-    <div class="header-top">
-      <div>
-        <div class="eyebrow">School &middot; Daily Attendance</div>
-        <h1>Rowda Attendance</h1>
-      </div>
-      <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
-        <button class="install-btn" id="install-btn" type="button" hidden>Install App</button>
-        <button class="admin-btn" id="admin-btn" type="button">Admin</button>
+    <div class="brand">
+      <div class="brand-mark"><svg class="icon" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+      <div class="brand-text">
+        <div class="brand-title">Rowda Attendance</div>
+        <div class="brand-sub">Attendance System</div>
       </div>
     </div>
-    <div class="subhead">Track when each teacher arrives and leaves, in real time.</div>
+    <div class="header-actions">
+      <button class="btn btn-outline btn-icon" id="install-btn" type="button" hidden title="Install App">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+      </button>
+      <button class="admin-toggle" id="admin-btn" type="button">
+        <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
+        <span id="admin-btn-label">Admin</span>
+      </button>
+    </div>
   </header>
 
-  <div class="member-strip" id="member-strip" hidden>
-    <span class="who">Signed in as <strong id="member-name"></strong></span>
-    <button id="switch-identity-btn" type="button">Not you?</button>
-  </div>
+  <main>
 
-  <div class="date-bar">
-    <div class="field">
-      <label for="date-picker">Date</label>
-      <input id="date-picker" type="date">
+    <div class="member-strip" id="member-strip" hidden>
+      <span class="who">
+        <svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg>
+        Signed in as <strong id="member-name"></strong>
+      </span>
+      <button id="switch-identity-btn" type="button">Not you?</button>
     </div>
-    <button class="today-btn" id="today-btn" type="button">Today</button>
-  </div>
 
-  <div class="summary" id="summary-tiles">
-    <div class="stat-tile present">
-      <div class="label">Checked In</div>
-      <div class="value" id="stat-present">0</div>
-    </div>
-    <div class="stat-tile late">
-      <div class="label">Late</div>
-      <div class="value" id="stat-late">0</div>
-    </div>
-    <div class="stat-tile absent">
-      <div class="label">Not Yet</div>
-      <div class="value" id="stat-absent">0</div>
-    </div>
-  </div>
+    <!-- ===== TEACHER VIEW ===== -->
+    <div id="teacher-view" hidden>
+      <div class="greeting-eyebrow" id="teacher-date-line"></div>
+      <div class="greeting-title" id="teacher-greeting">Good morning</div>
+      <div class="greeting-sub" id="teacher-sub"></div>
 
-  <button class="checkin-cta" id="open-checkin-btn" type="button">Check In / Check Out</button>
+      <div style="height:16px"></div>
 
-  <div class="roster" id="roster">
-    <div class="empty-state" id="empty-state">
-      <div class="glyph">&sect;</div>
-      <p>No teachers added yet. Open Admin to add your teaching staff.</p>
+      <div class="hero-card">
+        <div class="hero-eyebrow">Today's Attendance</div>
+        <div class="hero-badge pending" id="hero-badge">
+          <svg class="icon icon-xl" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <div class="hero-status" id="hero-status-line" hidden></div>
+        <div class="hero-time" id="hero-time" hidden></div>
+        <div class="hero-meta" id="hero-meta"></div>
+        <div class="location-required" id="hero-location-chip" hidden>
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          Location Required
+        </div>
+        <div class="hero-action">
+          <button class="btn btn-primary btn-lg btn-block" id="hero-action-btn" type="button">
+            <span class="btn-label"></span>
+            <div class="spinner"></div>
+          </button>
+        </div>
+      </div>
+
+      <div style="height:22px"></div>
+
+      <div class="section-title">
+        <span>Attendance History</span>
+        <span class="count" id="history-count"></span>
+      </div>
+      <div style="height:10px"></div>
+      <div class="history-list" id="history-list"></div>
     </div>
-  </div>
 
+    <!-- ===== ADMIN VIEW ===== -->
+    <div id="admin-view" hidden>
+      <div class="greeting-eyebrow" id="admin-date-line"></div>
+      <div class="greeting-title">Good morning, Administrator</div>
+      <div class="greeting-sub">Here's what's happening with attendance today.</div>
+
+      <div style="height:16px"></div>
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-icon blue"><svg class="icon" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-1a6 6 0 0 1 12 0v1"/><path d="M17 11l2 2 4-4"/></svg></div>
+          <div class="stat-value" id="stat-total">0</div>
+          <div class="stat-label">Total Teachers</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green"><svg class="icon" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+          <div class="stat-value" id="stat-present">0</div>
+          <div class="stat-label">Present Today</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon amber"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 7v5l3 3"/></svg></div>
+          <div class="stat-value" id="stat-late">0</div>
+          <div class="stat-label">Late Today</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon red"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></div>
+          <div class="stat-value" id="stat-absent">0</div>
+          <div class="stat-label">Not Yet</div>
+        </div>
+      </div>
+
+      <div style="height:18px"></div>
+
+      <div class="date-bar">
+        <div class="date-field">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          <input id="date-picker" type="date">
+        </div>
+        <button class="btn btn-outline" id="today-btn" type="button">Today</button>
+        <button class="btn btn-secondary" id="manage-btn" type="button">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+          Manage
+        </button>
+      </div>
+
+      <div style="height:18px"></div>
+
+      <div class="section-title"><span>Today's Roster</span></div>
+      <div style="height:10px"></div>
+      <div class="roster-list" id="roster"></div>
+    </div>
+
+    <!-- initial skeleton -->
+    <div id="loading-skeleton">
+      <div class="skeleton" style="height:22px; width:160px; margin-bottom:10px;"></div>
+      <div class="skeleton" style="height:14px; width:220px; margin-bottom:22px;"></div>
+      <div class="skeleton" style="height:280px; border-radius:20px;"></div>
+    </div>
+
+  </main>
 </div>
 
-<div class="panel" id="checkin-panel" hidden>
-  <div class="panel-card">
-    <button class="panel-close" id="checkin-close-btn" type="button" title="Close" aria-label="Close">&#10005;</button>
-
+<!-- ===== check-in kiosk panel (admin: pick any teacher) ===== -->
+<div class="panel-overlay" id="checkin-panel" hidden>
+  <div class="panel-sheet">
+    <button class="panel-close" id="checkin-close-btn" type="button" aria-label="Close"><svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
     <div id="checkin-pick-view">
       <h2>Who are you?</h2>
-      <p>Tap your name to check in or out.</p>
+      <p class="panel-desc">Tap a name to check in or out.</p>
       <div class="teacher-grid" id="checkin-teacher-grid"></div>
     </div>
+  </div>
+</div>
 
-    <div id="checkin-action-view" hidden>
-      <div class="action-status">
-        <div class="name" id="action-teacher-name"></div>
-        <div class="detail" id="action-detail"></div>
-        <button class="action-btn" id="action-btn" type="button"></button>
-        <div class="panel-status" id="action-status-line"></div>
+<!-- ===== verification / check-in flow panel ===== -->
+<div class="panel-overlay" id="verify-panel" hidden>
+  <div class="panel-sheet">
+    <button class="panel-close" id="verify-close-btn" type="button" aria-label="Close"><svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+
+    <div id="verify-steps-view">
+      <h2 id="verify-steps-title">Checking your location</h2>
+      <p class="panel-desc">Hold on a moment while we verify your attendance.</p>
+      <div class="verify-steps" id="verify-steps"></div>
+    </div>
+
+    <div id="verify-result-view" hidden>
+      <div class="result-icon-wrap" id="verify-result-icon-wrap">
+        <svg class="icon" viewBox="0 0 24 24" id="verify-result-icon"></svg>
       </div>
-      <button class="back-link" id="action-back-btn" type="button">&larr; Not you? Pick another name</button>
+      <div class="result-title" id="verify-result-title"></div>
+      <div class="result-detail" id="verify-result-detail"></div>
+      <div class="location-card" id="verify-location-card" hidden></div>
+      <button class="btn btn-primary btn-block" id="verify-result-ok-btn" type="button">Done</button>
+      <button class="btn btn-outline btn-block" id="verify-retry-btn" type="button" style="margin-top:8px;" hidden>Try Again</button>
     </div>
   </div>
 </div>
 
-<div class="panel" id="identity-panel" hidden>
-  <div class="panel-card">
+<!-- ===== registration panel ===== -->
+<div class="panel-overlay" id="identity-panel" hidden>
+  <div class="panel-sheet">
     <h2>Register Your Name</h2>
-    <p>Type your full name (first, father's, and family name) to register. After that, you'll only ever see your own attendance on this device.</p>
-    <div class="add-teacher-row">
-      <input id="register-name-input" type="text" placeholder="e.g. Faarax Cali Nuur" maxlength="60">
+    <p class="panel-desc">Type your full name (first, father's, and family name) to register. After that, you'll only ever see your own attendance on this device.</p>
+    <div class="input-row-stack">
+      <div class="field">
+        <input id="register-name-input" type="text" placeholder="e.g. Faarax Cali Nuur" maxlength="60">
+      </div>
+      <div class="field">
+        <input id="register-phone-input" type="tel" placeholder="Phone number (optional)" maxlength="20">
+      </div>
     </div>
-    <div class="add-teacher-row">
-      <input id="register-phone-input" type="tel" placeholder="Phone number (optional)" maxlength="20">
-      <button id="register-name-btn" type="button">Register</button>
-    </div>
-    <div class="panel-status" id="register-status-line"></div>
+    <button class="btn btn-primary btn-block" id="register-name-btn" type="button">
+      <span class="btn-label">Register</span>
+      <div class="spinner dark"></div>
+    </button>
+    <div class="error-text" id="register-status-line"></div>
   </div>
 </div>
 
-<div class="panel" id="pin-panel" hidden>
-  <div class="panel-card pin-card">
-    <button class="panel-close" id="pin-close-btn" type="button" title="Close" aria-label="Close">&#10005;</button>
+<!-- ===== admin PIN panel ===== -->
+<div class="panel-overlay" id="pin-panel" hidden>
+  <div class="panel-sheet" style="max-width:340px;">
+    <button class="panel-close" id="pin-close-btn" type="button" aria-label="Close"><svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
     <h2>Admin PIN</h2>
-    <p>Enter the admin PIN to manage teachers and settings.</p>
-    <input id="pin-input" type="password" inputmode="numeric" placeholder="&bull;&bull;&bull;&bull;" maxlength="12">
-    <button class="action-btn" id="pin-submit-btn" type="button">Unlock</button>
-    <div class="panel-status" id="pin-status-line"></div>
+    <p class="panel-desc">Enter the admin PIN to manage teachers and settings.</p>
+    <input id="pin-input" type="password" inputmode="numeric" placeholder="••••" maxlength="12" style="text-align:center; letter-spacing:.4em; font-family: var(--mono); font-size:19px; margin-bottom:12px;">
+    <button class="btn btn-primary btn-block" id="pin-submit-btn" type="button">Unlock</button>
+    <div class="error-text" id="pin-status-line" style="text-align:center; margin-top:8px;"></div>
   </div>
 </div>
 
-<div class="panel" id="admin-panel" hidden>
-  <div class="panel-card">
-    <button class="panel-close" id="admin-close-btn" type="button" title="Close" aria-label="Close">&#10005;</button>
-    <h2>Admin</h2>
-    <p>Manage your teaching staff, the school start time, and the check-in location.</p>
+<!-- ===== admin management sheet ===== -->
+<div class="panel-overlay" id="admin-panel" hidden>
+  <div class="panel-sheet wide" style="height:600px;">
+    <button class="panel-close" id="admin-close-btn" type="button" aria-label="Close"><svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <h2>Manage</h2>
+    <p class="panel-desc">Teachers, branches, reports and settings.</p>
 
-    <div class="admin-section">
-      <h3>Teachers</h3>
-      <div class="add-teacher-row">
-        <input id="new-teacher-input" type="text" placeholder="Teacher's name" maxlength="60">
+    <div class="admin-sheet-body">
+      <div class="admin-tabs" id="admin-tabs">
+        <button class="admin-tab active" data-tab="teachers" type="button">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-1a6 6 0 0 1 12 0v1"/><path d="M17 11l2 2 4-4"/></svg>
+          Teachers
+        </button>
+        <button class="admin-tab" data-tab="branches" type="button">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>
+          Branches
+        </button>
+        <button class="admin-tab" data-tab="reports" type="button">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg>
+          Reports
+        </button>
+        <button class="admin-tab" data-tab="settings" type="button">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.6V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.6 1H21a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.5 1Z"/></svg>
+          Settings
+        </button>
       </div>
-      <div class="add-teacher-row">
-        <input id="new-teacher-phone-input" type="tel" placeholder="Phone number (optional)" maxlength="20">
-        <button id="add-teacher-btn" type="button">Add</button>
-      </div>
-      <div class="teacher-manage-list" id="teacher-manage-list"></div>
-    </div>
 
-    <div class="admin-section">
-      <h3>School Start Time</h3>
-      <div class="settings-row">
-        <div class="field">
-          <label for="start-time-input">Start time</label>
-          <input id="start-time-input" type="time" value="08:00">
+      <div class="admin-tab-panels">
+        <div class="admin-tab-panel" id="tab-teachers">
+          <div class="admin-section">
+            <h3>Add Teacher</h3>
+            <div class="input-row-stack">
+              <input id="new-teacher-input" type="text" placeholder="Teacher's name" maxlength="60">
+              <input id="new-teacher-phone-input" type="tel" placeholder="Phone number (optional)" maxlength="20">
+            </div>
+            <button class="btn btn-primary btn-block" id="add-teacher-btn" type="button">
+              <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+              <span class="btn-label">Add Teacher</span>
+              <div class="spinner dark"></div>
+            </button>
+          </div>
+          <div class="admin-section">
+            <h3>Staff List</h3>
+            <div class="manage-list" id="teacher-manage-list"></div>
+          </div>
         </div>
-        <button id="save-start-time-btn" type="button">Save</button>
+
+        <div class="admin-tab-panel" id="tab-branches" hidden>
+          <div class="admin-section">
+            <h3>Geofence Status</h3>
+            <div class="location-status-line" id="location-status-line"></div>
+          </div>
+          <div class="admin-section">
+            <h3>Configured Branches</h3>
+            <div class="manage-list" id="branch-manage-list"></div>
+          </div>
+          <div class="admin-section">
+            <h3>Add Branch</h3>
+            <div class="input-row-stack">
+              <input id="new-branch-input" type="text" placeholder="Branch name (e.g. Main Campus)" maxlength="60">
+            </div>
+            <div class="settings-row">
+              <div class="field">
+                <label for="radius-input">Radius (meters)</label>
+                <input id="radius-input" type="number" inputmode="numeric" min="20" step="10" value="150">
+              </div>
+              <button class="btn btn-primary" id="use-my-location-btn" type="button">
+                <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span class="btn-label">Use My Location</span>
+                <div class="spinner dark"></div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-tab-panel" id="tab-reports" hidden>
+          <div class="admin-section">
+            <h3>Date Range</h3>
+            <div class="settings-row" style="margin-bottom:12px;">
+              <div class="field">
+                <label for="report-from-input">From</label>
+                <input id="report-from-input" type="date">
+              </div>
+              <div class="field">
+                <label for="report-to-input">To</label>
+                <input id="report-to-input" type="date">
+              </div>
+            </div>
+            <button class="btn btn-secondary btn-block" id="export-csv-btn" type="button">
+              <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+              Export CSV
+            </button>
+          </div>
+          <div class="admin-section">
+            <h3>Summary</h3>
+            <div class="manage-list" id="report-summary-list"></div>
+          </div>
+        </div>
+
+        <div class="admin-tab-panel" id="tab-settings" hidden>
+          <div class="admin-section">
+            <h3>School Start Time</h3>
+            <div class="settings-row">
+              <div class="field">
+                <label for="start-time-input">Start time</label>
+                <input id="start-time-input" type="time" value="08:00">
+              </div>
+              <button class="btn btn-primary" id="save-start-time-btn" type="button">Save</button>
+            </div>
+          </div>
+          <div class="admin-section">
+            <h3>Session</h3>
+            <button class="btn btn-danger-outline btn-block exit-admin-btn" id="exit-admin-btn" type="button">
+              <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+              Exit Admin Mode
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-
-    <div class="admin-section">
-      <h3>School Branches (Geofence)</h3>
-      <p class="location-status" id="location-status-line">No branches set — teachers can check in from anywhere.</p>
-      <div class="branch-manage-list" id="branch-manage-list"></div>
-      <div class="add-teacher-row" style="margin-top:10px;">
-        <input id="new-branch-input" type="text" placeholder="Branch name (e.g. Main Campus)" maxlength="60">
-      </div>
-      <div class="settings-row" style="margin-top:8px;">
-        <div class="field">
-          <label for="radius-input">Radius (meters)</label>
-          <input id="radius-input" type="number" inputmode="numeric" min="20" step="10" value="150" style="width:100px;">
-        </div>
-        <button id="use-my-location-btn" type="button">Add Branch at My Location</button>
-      </div>
-    </div>
-
-    <div class="admin-section">
-      <h3>Reports &amp; Export</h3>
-      <div class="settings-row" style="margin-bottom:10px;">
-        <div class="field">
-          <label for="report-from-input">From</label>
-          <input id="report-from-input" type="date">
-        </div>
-        <div class="field">
-          <label for="report-to-input">To</label>
-          <input id="report-to-input" type="date">
-        </div>
-        <button id="export-csv-btn" type="button">Export CSV</button>
-      </div>
-      <div class="teacher-manage-list" id="report-summary-list" style="max-height:220px;"></div>
-    </div>
-
-    <div class="panel-status" id="admin-status-line"></div>
-    <button class="exit-admin-btn" id="exit-admin-btn" type="button">Exit Admin Mode</button>
   </div>
 </div>
+
+<!-- ===== generic confirm modal ===== -->
+<div class="panel-overlay" id="confirm-panel" hidden>
+  <div class="panel-sheet" style="max-width:360px;">
+    <div class="confirm-icon-wrap" id="confirm-icon-wrap">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+    </div>
+    <h2 id="confirm-title">Are you sure?</h2>
+    <p class="panel-desc" id="confirm-message"></p>
+    <div class="confirm-actions">
+      <button class="btn btn-outline" id="confirm-cancel-btn" type="button">Cancel</button>
+      <button class="btn btn-danger" id="confirm-ok-btn" type="button">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toast-stack"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
@@ -903,15 +993,33 @@
   // ---------- DOM refs ----------
   const installBtn = document.getElementById("install-btn");
   const adminBtn = document.getElementById("admin-btn");
+  const adminBtnLabel = document.getElementById("admin-btn-label");
+  const loadingSkeleton = document.getElementById("loading-skeleton");
+
+  const teacherView = document.getElementById("teacher-view");
+  const adminView = document.getElementById("admin-view");
+
+  const teacherDateLine = document.getElementById("teacher-date-line");
+  const teacherGreeting = document.getElementById("teacher-greeting");
+  const teacherSub = document.getElementById("teacher-sub");
+  const heroBadge = document.getElementById("hero-badge");
+  const heroStatusLine = document.getElementById("hero-status-line");
+  const heroTime = document.getElementById("hero-time");
+  const heroMeta = document.getElementById("hero-meta");
+  const heroLocationChip = document.getElementById("hero-location-chip");
+  const heroActionBtn = document.getElementById("hero-action-btn");
+  const historyList = document.getElementById("history-list");
+  const historyCount = document.getElementById("history-count");
+
+  const adminDateLine = document.getElementById("admin-date-line");
   const datePicker = document.getElementById("date-picker");
   const todayBtn = document.getElementById("today-btn");
+  const manageBtn = document.getElementById("manage-btn");
+  const statTotal = document.getElementById("stat-total");
   const statPresent = document.getElementById("stat-present");
   const statLate = document.getElementById("stat-late");
   const statAbsent = document.getElementById("stat-absent");
-  const summaryTiles = document.getElementById("summary-tiles");
-  const openCheckinBtn = document.getElementById("open-checkin-btn");
   const roster = document.getElementById("roster");
-  const emptyState = document.getElementById("empty-state");
 
   const memberStrip = document.getElementById("member-strip");
   const memberName = document.getElementById("member-name");
@@ -924,14 +1032,21 @@
 
   const checkinPanel = document.getElementById("checkin-panel");
   const checkinCloseBtn = document.getElementById("checkin-close-btn");
-  const checkinPickView = document.getElementById("checkin-pick-view");
   const checkinTeacherGrid = document.getElementById("checkin-teacher-grid");
-  const checkinActionView = document.getElementById("checkin-action-view");
-  const actionTeacherName = document.getElementById("action-teacher-name");
-  const actionDetail = document.getElementById("action-detail");
-  const actionBtn = document.getElementById("action-btn");
-  const actionStatusLine = document.getElementById("action-status-line");
-  const actionBackBtn = document.getElementById("action-back-btn");
+
+  const verifyPanel = document.getElementById("verify-panel");
+  const verifyCloseBtn = document.getElementById("verify-close-btn");
+  const verifyStepsView = document.getElementById("verify-steps-view");
+  const verifyStepsTitle = document.getElementById("verify-steps-title");
+  const verifySteps = document.getElementById("verify-steps");
+  const verifyResultView = document.getElementById("verify-result-view");
+  const verifyResultIconWrap = document.getElementById("verify-result-icon-wrap");
+  const verifyResultIcon = document.getElementById("verify-result-icon");
+  const verifyResultTitle = document.getElementById("verify-result-title");
+  const verifyResultDetail = document.getElementById("verify-result-detail");
+  const verifyLocationCard = document.getElementById("verify-location-card");
+  const verifyResultOkBtn = document.getElementById("verify-result-ok-btn");
+  const verifyRetryBtn = document.getElementById("verify-retry-btn");
 
   const pinPanel = document.getElementById("pin-panel");
   const pinCloseBtn = document.getElementById("pin-close-btn");
@@ -941,23 +1056,31 @@
 
   const adminPanel = document.getElementById("admin-panel");
   const adminCloseBtn = document.getElementById("admin-close-btn");
+  const adminTabs = document.getElementById("admin-tabs");
   const newTeacherInput = document.getElementById("new-teacher-input");
   const newTeacherPhoneInput = document.getElementById("new-teacher-phone-input");
   const addTeacherBtn = document.getElementById("add-teacher-btn");
   const teacherManageList = document.getElementById("teacher-manage-list");
-  const reportFromInput = document.getElementById("report-from-input");
-  const reportToInput = document.getElementById("report-to-input");
-  const exportCsvBtn = document.getElementById("export-csv-btn");
-  const reportSummaryList = document.getElementById("report-summary-list");
   const startTimeInput = document.getElementById("start-time-input");
   const saveStartTimeBtn = document.getElementById("save-start-time-btn");
-  const adminStatusLine = document.getElementById("admin-status-line");
   const exitAdminBtn = document.getElementById("exit-admin-btn");
   const locationStatusLine = document.getElementById("location-status-line");
   const radiusInput = document.getElementById("radius-input");
   const useMyLocationBtn = document.getElementById("use-my-location-btn");
   const newBranchInput = document.getElementById("new-branch-input");
   const branchManageList = document.getElementById("branch-manage-list");
+  const reportFromInput = document.getElementById("report-from-input");
+  const reportToInput = document.getElementById("report-to-input");
+  const exportCsvBtn = document.getElementById("export-csv-btn");
+  const reportSummaryList = document.getElementById("report-summary-list");
+
+  const confirmPanel = document.getElementById("confirm-panel");
+  const confirmTitle = document.getElementById("confirm-title");
+  const confirmMessage = document.getElementById("confirm-message");
+  const confirmCancelBtn = document.getElementById("confirm-cancel-btn");
+  const confirmOkBtn = document.getElementById("confirm-ok-btn");
+
+  const toastStack = document.getElementById("toast-stack");
 
   // ---------- state ----------
   let teachers = [];
@@ -967,6 +1090,7 @@
   let selectedTeacher = null;
   let isAdmin = sessionStorage.getItem(ADMIN_SESSION_KEY) === "1";
   let myTeacherId = localStorage.getItem(MY_TEACHER_KEY);
+  let hasLoadedOnce = false;
 
   function getMyTeacher() {
     return teachers.find((t) => t.id === myTeacherId) || null;
@@ -981,6 +1105,10 @@
 
   function timeLabel(ts) {
     return new Date(ts).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+  }
+
+  function fullDateLabel(ts) {
+    return new Date(ts).toLocaleDateString(undefined, { weekday: "long", year: "numeric", month: "long", day: "numeric" });
   }
 
   function selectedDateKey() {
@@ -999,6 +1127,62 @@
     const h = Math.floor(mins / 60);
     const m = mins % 60;
     return h + "h " + m + "m";
+  }
+
+  function initials(name) {
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    return ((parts[0] || "")[0] || "") + ((parts[1] || "")[0] || "");
+  }
+
+  function greetingWord() {
+    const h = new Date().getHours();
+    if (h < 12) return "Good morning";
+    if (h < 17) return "Good afternoon";
+    return "Good evening";
+  }
+
+  // ---------- toasts ----------
+  const TOAST_ICONS = {
+    success: '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/>',
+    error: '<circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/>',
+    warning: '<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+    info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+  };
+
+  function showToast(type, title, message) {
+    const el = document.createElement("div");
+    el.className = "toast " + type;
+    el.innerHTML =
+      '<div class="toast-icon"><svg class="icon icon-sm" viewBox="0 0 24 24">' + (TOAST_ICONS[type] || TOAST_ICONS.info) + '</svg></div>' +
+      '<div class="toast-body"><div class="toast-title"></div><div class="toast-msg"></div></div>' +
+      '<button class="toast-close" type="button" aria-label="Dismiss"><svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>';
+    el.querySelector(".toast-title").textContent = title;
+    el.querySelector(".toast-msg").textContent = message || "";
+    function dismiss() {
+      el.classList.add("leaving");
+      setTimeout(() => el.remove(), 180);
+    }
+    el.querySelector(".toast-close").addEventListener("click", dismiss);
+    toastStack.appendChild(el);
+    setTimeout(dismiss, 4200);
+  }
+
+  // ---------- confirm modal ----------
+  let confirmResolver = null;
+  function askConfirm(title, message, okLabel) {
+    confirmTitle.textContent = title;
+    confirmMessage.textContent = message;
+    confirmOkBtn.textContent = okLabel || "Confirm";
+    confirmPanel.hidden = false;
+    return new Promise((resolve) => { confirmResolver = resolve; });
+  }
+  confirmCancelBtn.addEventListener("click", () => { confirmPanel.hidden = true; if (confirmResolver) confirmResolver(false); });
+  confirmOkBtn.addEventListener("click", () => { confirmPanel.hidden = true; if (confirmResolver) confirmResolver(true); });
+
+  // ---------- button loading helper ----------
+  function setBtnLoading(btn, loading) {
+    btn.classList.toggle("is-loading", loading);
+    btn.disabled = loading;
   }
 
   // ---------- geofencing ----------
@@ -1033,28 +1217,27 @@
     return err && err.message ? err.message : "Could not verify your location.";
   }
 
-  // Resolves { ok: true, branchName } if within range of any branch (or no
-  // geofence configured), or { ok: false, message } if check-in should be blocked.
+  // Resolves { ok: true, branchName, distance, accuracy } if within range of any
+  // branch (or no geofence configured), or { ok: false, message } to block check-in.
   async function verifyAtSchool() {
     if (!hasGeofence()) return { ok: true, branchName: null };
-    try {
-      const pos = await getCurrentPosition({ enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
-      let nearest = null;
-      for (const b of branches) {
-        const dist = distanceMeters(pos.coords.latitude, pos.coords.longitude, b.lat, b.lng);
-        if (!nearest || dist < nearest.dist) nearest = { branch: b, dist };
-        if (dist <= (b.radiusMeters || 150)) {
-          return { ok: true, branchName: b.name };
-        }
+    const pos = await getCurrentPosition({ enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+    let nearest = null;
+    for (const b of branches) {
+      const dist = distanceMeters(pos.coords.latitude, pos.coords.longitude, b.lat, b.lng);
+      if (!nearest || dist < nearest.dist) nearest = { branch: b, dist };
+      if (dist <= (b.radiusMeters || 150)) {
+        return { ok: true, branchName: b.name, distance: Math.round(dist), accuracy: Math.round(pos.coords.accuracy || 0) };
       }
-      const radius = nearest.branch.radiusMeters || 150;
-      return {
-        ok: false,
-        message: "You're " + Math.round(nearest.dist) + "m from the nearest branch (" + nearest.branch.name + ", limit " + radius + "m). Move closer and try again.",
-      };
-    } catch (e) {
-      return { ok: false, message: friendlyGeoError(e) };
     }
+    const radius = nearest.branch.radiusMeters || 150;
+    return {
+      ok: false,
+      message: "You're " + Math.round(nearest.dist) + "m from the nearest branch (" + nearest.branch.name + ", limit " + radius + "m). Move closer and try again.",
+      distance: Math.round(nearest.dist),
+      branchName: nearest.branch.name,
+      radius,
+    };
   }
 
   // ---------- install prompt ----------
@@ -1078,13 +1261,13 @@
 
   // ---------- date bar ----------
   datePicker.value = todayKey();
-  datePicker.addEventListener("change", renderRoster);
+  datePicker.addEventListener("change", renderAll);
   todayBtn.addEventListener("click", () => {
     datePicker.value = todayKey();
-    renderRoster();
+    renderAll();
   });
 
-  // ---------- roster rendering ----------
+  // ---------- shared record helpers ----------
   function attendanceRecordFor(teacherId, dateKey) {
     const dayMap = attendanceByDate.get(dateKey);
     return dayMap ? dayMap.get(teacherId) : null;
@@ -1097,30 +1280,166 @@
     return { key: "on-time", label: "On Time" };
   }
 
-  function renderRoster() {
-    summaryTiles.hidden = !isAdmin;
+  function badgeForStatus(key) {
+    if (key === "on-time" || key === "checked-out") return "badge-success";
+    if (key === "late") return "badge-warning";
+    return "badge-neutral";
+  }
 
-    const dateKey = selectedDateKey();
-    roster.innerHTML = "";
+  // ---------- master render ----------
+  function renderAll() {
+    if (isAdmin) {
+      teacherView.hidden = true;
+      adminView.hidden = false;
+      memberStrip.hidden = true;
+      renderAdminDashboard();
+    } else {
+      adminView.hidden = true;
+      const me = getMyTeacher();
+      if (me) {
+        teacherView.hidden = false;
+        memberStrip.hidden = false;
+        memberName.textContent = me.name;
+        renderTeacherView(me);
+      } else {
+        teacherView.hidden = true;
+        memberStrip.hidden = true;
+        myTeacherId = null;
+        localStorage.removeItem(MY_TEACHER_KEY);
+        registerNameInput.value = "";
+        registerPhoneInput.value = "";
+        registerStatusLine.textContent = "";
+        identityPanel.hidden = false;
+      }
+    }
+    if (!adminPanel.hidden) {
+      renderTeacherManageList();
+      renderBranchManageList();
+      renderReportSummary();
+    }
+  }
 
-    const visibleTeachers = isAdmin ? teachers : (getMyTeacher() ? [getMyTeacher()] : []);
+  // ---------- teacher dashboard ----------
+  function renderTeacherView(me) {
+    const now = Date.now();
+    teacherDateLine.textContent = "Today";
+    teacherGreeting.textContent = greetingWord() + ",";
+    teacherSub.textContent = me.name + (branches.length ? " · " + fullDateLabel(now) : " · " + fullDateLabel(now));
 
-    if (visibleTeachers.length === 0) {
-      roster.appendChild(emptyState);
-      emptyState.querySelector("p").textContent = isAdmin
-        ? "No teachers added yet. Open Admin to add your teaching staff."
-        : "No teachers added yet. Ask your admin to add you to the staff list.";
-      statPresent.textContent = "0";
-      statLate.textContent = "0";
-      statAbsent.textContent = "0";
+    const rec = attendanceRecordFor(me.id, todayKey());
+    const status = statusForRecord(rec);
+
+    heroActionBtn.disabled = false;
+    heroLocationChip.hidden = !hasGeofence() || status.key === "checked-out";
+
+    if (status.key === "not-arrived") {
+      heroBadge.className = "hero-badge pending";
+      heroBadge.innerHTML = '<svg class="icon icon-xl" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>';
+      heroStatusLine.hidden = true;
+      heroTime.hidden = true;
+      heroMeta.textContent = "Ready to check in";
+      heroActionBtn.querySelector(".btn-label").innerHTML = '<svg class="icon" viewBox="0 0 24 24" style="margin-right:6px; vertical-align:-3px;"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>Check In';
+      heroActionBtn.className = "btn btn-primary btn-lg btn-block";
+      heroActionBtn.dataset.action = "in";
+    } else if (!rec.checkOutAt) {
+      const late = status.key === "late";
+      heroBadge.className = "hero-badge " + (late ? "late" : "present");
+      heroBadge.innerHTML = '<svg class="icon icon-xl" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>';
+      heroStatusLine.hidden = false;
+      heroStatusLine.className = "hero-status " + (late ? "late" : "present");
+      heroStatusLine.textContent = late ? "LATE" : "PRESENT";
+      heroTime.hidden = false;
+      heroTime.textContent = timeLabel(rec.checkInAt);
+      heroMeta.innerHTML = rec.branch ? '<strong>' + rec.branch + '</strong>' : "Checked in";
+      heroActionBtn.querySelector(".btn-label").innerHTML = '<svg class="icon" viewBox="0 0 24 24" style="margin-right:6px; vertical-align:-3px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>Check Out';
+      heroActionBtn.className = "btn btn-success btn-lg btn-block";
+      heroActionBtn.dataset.action = "out";
+    } else {
+      heroBadge.className = "hero-badge done";
+      heroBadge.innerHTML = '<svg class="icon icon-xl" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>';
+      heroStatusLine.hidden = false;
+      heroStatusLine.className = "hero-status";
+      heroStatusLine.textContent = "DONE FOR TODAY";
+      heroTime.hidden = false;
+      heroTime.textContent = hoursBetween(rec.checkInAt, rec.checkOutAt);
+      heroMeta.innerHTML = "In " + timeLabel(rec.checkInAt) + " &middot; Out " + timeLabel(rec.checkOutAt);
+      heroActionBtn.querySelector(".btn-label").textContent = "Already Checked Out";
+      heroActionBtn.className = "btn btn-secondary btn-lg btn-block";
+      heroActionBtn.disabled = true;
+      heroActionBtn.dataset.action = "";
+    }
+
+    renderHistory(me);
+  }
+
+  function renderHistory(me) {
+    const rows = [];
+    for (const [dk, dayMap] of attendanceByDate.entries()) {
+      const rec = dayMap.get(me.id);
+      if (rec) rows.push(rec);
+    }
+    rows.sort((a, b) => b.date.localeCompare(a.date));
+    const recent = rows.slice(0, 10);
+    historyCount.textContent = recent.length ? recent.length + " record" + (recent.length === 1 ? "" : "s") : "";
+    historyList.innerHTML = "";
+
+    if (recent.length === 0) {
+      historyList.appendChild(emptyStateEl(
+        '<path d="M8 2v4M16 2v4M3 10h18"/><rect x="3" y="4" width="18" height="18" rx="2"/>',
+        "No attendance records",
+        "Your check-in history will show up here once you check in for the first time."
+      ));
       return;
     }
 
-    let present = 0;
-    let late = 0;
-    let absent = 0;
+    for (const rec of recent) {
+      const d = new Date(rec.date + "T00:00:00");
+      const status = statusForRecord(rec);
+      const row = document.createElement("div");
+      row.className = "history-card";
+      row.innerHTML =
+        '<div class="history-date"><div class="dow">' + d.toLocaleDateString(undefined, { month: "short" }) + '</div><div class="num">' + d.getDate() + '</div></div>' +
+        '<div class="history-body">' +
+          '<div class="history-times">In ' + (rec.checkInAt ? timeLabel(rec.checkInAt) : "--") + (rec.checkOutAt ? " &middot; Out " + timeLabel(rec.checkOutAt) : "") + '</div>' +
+          '<div class="history-hours">' + (rec.checkInAt && rec.checkOutAt ? hoursBetween(rec.checkInAt, rec.checkOutAt) + " worked" : (rec.branch || "")) + '</div>' +
+        '</div>' +
+        '<span class="badge ' + badgeForStatus(status.key) + '"><span class="dot"></span>' + status.label + '</span>';
+      historyList.appendChild(row);
+    }
+  }
 
-    const sorted = visibleTeachers.slice().sort((a, b) => a.name.localeCompare(b.name));
+  function emptyStateEl(iconPath, title, desc) {
+    const wrap = document.createElement("div");
+    wrap.className = "empty-state";
+    wrap.innerHTML =
+      '<div class="empty-icon"><svg class="icon icon-lg" viewBox="0 0 24 24">' + iconPath + '</svg></div>' +
+      '<h4></h4><p></p>';
+    wrap.querySelector("h4").textContent = title;
+    wrap.querySelector("p").textContent = desc;
+    return wrap;
+  }
+
+  // ---------- admin dashboard ----------
+  function renderAdminDashboard() {
+    adminDateLine.textContent = fullDateLabel(Date.now());
+    const dateKey = selectedDateKey();
+    roster.innerHTML = "";
+
+    if (teachers.length === 0) {
+      statTotal.textContent = "0";
+      statPresent.textContent = "0";
+      statLate.textContent = "0";
+      statAbsent.textContent = "0";
+      roster.appendChild(emptyStateEl(
+        '<circle cx="9" cy="7" r="4"/><path d="M3 21v-1a6 6 0 0 1 12 0v1"/><path d="M17 11l2 2 4-4"/>',
+        "No teachers yet",
+        "Open Manage to add your teaching staff."
+      ));
+      return;
+    }
+
+    let present = 0, late = 0, absent = 0;
+    const sorted = teachers.slice().sort((a, b) => a.name.localeCompare(b.name));
     for (const t of sorted) {
       const rec = attendanceRecordFor(t.id, dateKey);
       const status = statusForRecord(rec);
@@ -1129,122 +1448,172 @@
 
       const row = document.createElement("div");
       row.className = "roster-row";
-      const main = document.createElement("div");
-      main.className = "roster-main";
-      const name = document.createElement("div");
-      name.className = "roster-name";
-      name.textContent = t.name;
-      main.appendChild(name);
+      row.innerHTML =
+        '<div class="roster-avatar"></div>' +
+        '<div class="roster-main"><div class="roster-name"></div><div class="roster-time"></div></div>' +
+        '<span class="badge ' + badgeForStatus(status.key) + '"><span class="dot"></span>' + status.label + '</span>';
+      row.querySelector(".roster-avatar").textContent = initials(t.name).toUpperCase();
+      row.querySelector(".roster-name").textContent = t.name;
+      const timeEl = row.querySelector(".roster-time");
       if (rec && rec.checkInAt) {
-        const timeEl = document.createElement("div");
-        timeEl.className = "roster-time";
         let text = "In " + timeLabel(rec.checkInAt);
         if (rec.branch) text += " at " + rec.branch;
         if (rec.checkOutAt) text += " · Out " + timeLabel(rec.checkOutAt) + " · " + hoursBetween(rec.checkInAt, rec.checkOutAt);
         timeEl.textContent = text;
-        main.appendChild(timeEl);
+      } else {
+        timeEl.remove();
       }
-      const pill = document.createElement("div");
-      pill.className = "status-pill " + status.key;
-      pill.textContent = status.label;
-      row.appendChild(main);
-      row.appendChild(pill);
       roster.appendChild(row);
     }
 
+    statTotal.textContent = String(teachers.length);
     statPresent.textContent = String(present);
     statLate.textContent = String(late);
     statAbsent.textContent = String(absent);
   }
 
-  // ---------- check-in kiosk ----------
-  function openCheckinPanel() {
-    if (!isAdmin) {
-      const me = getMyTeacher();
-      if (me) {
-        selectTeacherForCheckin(me);
-        checkinPanel.hidden = false;
-        return;
-      }
+  // ---------- verification / check-in flow ----------
+  const STEP_DEFS_GEO = [
+    { key: "gps", label: "Getting GPS location" },
+    { key: "branch", label: "Checking branch" },
+    { key: "distance", label: "Verifying distance" },
+    { key: "save", label: "Saving attendance" },
+  ];
+  const STEP_DEFS_PLAIN = [
+    { key: "save", label: "Saving attendance" },
+  ];
+
+  function buildSteps(defs) {
+    verifySteps.innerHTML = "";
+    for (const s of defs) {
+      const row = document.createElement("div");
+      row.className = "verify-step";
+      row.dataset.key = s.key;
+      row.innerHTML = '<div class="verify-step-dot"></div><div class="verify-step-label"></div>';
+      row.querySelector(".verify-step-label").textContent = s.label;
+      verifySteps.appendChild(row);
     }
-    checkinPickView.hidden = false;
-    checkinActionView.hidden = true;
-    checkinTeacherGrid.innerHTML = "";
-    const sorted = teachers.slice().sort((a, b) => a.name.localeCompare(b.name));
-    for (const t of sorted) {
-      const btn = document.createElement("button");
-      btn.className = "teacher-pick-btn";
-      btn.type = "button";
-      btn.textContent = t.name;
-      btn.addEventListener("click", () => selectTeacherForCheckin(t));
-      checkinTeacherGrid.appendChild(btn);
-    }
-    checkinPanel.hidden = false;
   }
 
-  function selectTeacherForCheckin(teacher) {
-    selectedTeacher = teacher;
-    checkinPickView.hidden = true;
-    checkinActionView.hidden = false;
-    actionBackBtn.hidden = !isAdmin;
-    actionStatusLine.textContent = "";
-    actionTeacherName.textContent = teacher.name;
-    const rec = attendanceRecordFor(teacher.id, todayKey());
-    if (!rec || !rec.checkInAt) {
-      actionDetail.textContent = "You haven't checked in today.";
-      actionBtn.textContent = "Check In";
-      actionBtn.className = "action-btn";
-      actionBtn.disabled = false;
-      actionBtn.dataset.action = "in";
-    } else if (!rec.checkOutAt) {
-      actionDetail.textContent = "Checked in at " + timeLabel(rec.checkInAt) + ".";
-      actionBtn.textContent = "Check Out";
-      actionBtn.className = "action-btn outcome";
-      actionBtn.disabled = false;
-      actionBtn.dataset.action = "out";
+  function setStepState(key, state) {
+    const row = verifySteps.querySelector('[data-key="' + key + '"]');
+    if (!row) return;
+    row.classList.remove("active", "done");
+    const dot = row.querySelector(".verify-step-dot");
+    if (state === "active") {
+      row.classList.add("active");
+      dot.innerHTML = '<div class="spinner dark" style="position:static;"></div>';
+    } else if (state === "done") {
+      row.classList.add("done");
+      dot.innerHTML = '<svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>';
     } else {
-      actionDetail.textContent = "Done for today — in " + timeLabel(rec.checkInAt) + ", out " + timeLabel(rec.checkOutAt) + ".";
-      actionBtn.textContent = "Already Checked Out";
-      actionBtn.className = "action-btn";
-      actionBtn.disabled = true;
-      actionBtn.dataset.action = "";
+      dot.innerHTML = "";
     }
   }
 
-  actionBackBtn.addEventListener("click", () => {
-    checkinPickView.hidden = false;
-    checkinActionView.hidden = true;
-  });
+  function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
-  actionBtn.addEventListener("click", async () => {
-    const action = actionBtn.dataset.action;
-    if (!action || !selectedTeacher) return;
-    actionBtn.disabled = true;
+  function openVerifyPanel() {
+    verifyStepsView.hidden = false;
+    verifyResultView.hidden = true;
+    verifyCloseBtn.hidden = false;
+    verifyPanel.hidden = false;
+  }
 
-    let branchName = null;
-    if (hasGeofence()) {
-      actionStatusLine.textContent = "Checking your location...";
-      const check = await verifyAtSchool();
-      if (!check.ok) {
-        actionStatusLine.textContent = check.message;
-        actionBtn.disabled = false;
-        return;
+  function showVerifyResult(ok, opts) {
+    verifyStepsView.hidden = true;
+    verifyResultView.hidden = false;
+    verifyRetryBtn.hidden = ok;
+    verifyResultOkBtn.hidden = !ok;
+    verifyResultOkBtn.textContent = "Done";
+
+    if (ok) {
+      verifyResultIconWrap.className = "result-icon-wrap success";
+      verifyResultIcon.innerHTML = '<path d="M20 6 9 17l-5-5"/>';
+      verifyResultTitle.textContent = opts.action === "out" ? "Check-out Successful" : "Check-in Successful";
+      let detail = opts.action === "out"
+        ? "You worked <strong>" + opts.hours + "</strong> today."
+        : "Checked in at <strong>" + opts.time + "</strong>.";
+      verifyResultDetail.innerHTML = detail;
+      if (opts.branchName) {
+        verifyLocationCard.hidden = false;
+        verifyLocationCard.innerHTML =
+          rowHtml("Branch", opts.branchName) +
+          (opts.distance != null ? rowHtml("Distance", opts.distance + " m") : "") +
+          (opts.accuracy != null ? rowHtml("GPS Accuracy", "±" + opts.accuracy + " m") : "") +
+          rowHtml("Status", "Within allowed area");
+      } else {
+        verifyLocationCard.hidden = true;
       }
-      branchName = check.branchName;
+    } else {
+      verifyResultIconWrap.className = "result-icon-wrap error";
+      verifyResultIcon.innerHTML = '<circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/>';
+      verifyResultTitle.textContent = opts.title || "Check-in Failed";
+      verifyResultDetail.innerHTML = opts.message || "Something went wrong. Please try again.";
+      if (opts.distance != null) {
+        verifyLocationCard.hidden = false;
+        verifyLocationCard.innerHTML =
+          rowHtml("Branch", opts.branchName || "—") +
+          rowHtml("Your Distance", opts.distance + " m") +
+          rowHtml("Allowed Radius", (opts.radius || 150) + " m");
+      } else {
+        verifyLocationCard.hidden = true;
+      }
     }
+  }
 
-    actionStatusLine.textContent = "Saving...";
+  function rowHtml(k, v) {
+    return '<div class="location-card-row"><span class="k">' + k + '</span><span class="v">' + v + '</span></div>';
+  }
+
+  async function runCheckInFlow(teacher, action) {
+    openVerifyPanel();
+    verifyStepsTitle.textContent = action === "out" ? "Checking you out" : "Checking your location";
+    const needsGeo = hasGeofence();
+    buildSteps(needsGeo ? STEP_DEFS_GEO : STEP_DEFS_PLAIN);
+    verifyCloseBtn.hidden = true;
+
+    let branchName = null, distance = null, accuracy = null;
+
     try {
+      if (needsGeo) {
+        setStepState("gps", "active");
+        await sleep(250);
+        const check = await verifyAtSchool();
+        setStepState("gps", "done");
+        setStepState("branch", "active");
+        await sleep(220);
+        setStepState("branch", "done");
+        setStepState("distance", "active");
+        await sleep(220);
+        if (!check.ok) {
+          showVerifyResult(false, {
+            title: "Location Outside Allowed Area",
+            message: check.message,
+            distance: check.distance,
+            branchName: check.branchName,
+            radius: check.radius,
+          });
+          return;
+        }
+        setStepState("distance", "done");
+        branchName = check.branchName;
+        distance = check.distance;
+        accuracy = check.accuracy;
+      }
+
+      setStepState("save", "active");
       const cred = await authReady;
       const uid = (cred && cred.user && cred.user.uid) || myUid || (auth.currentUser && auth.currentUser.uid);
       if (!uid) throw new Error("no uid");
       const dateKey = todayKey();
-      const docId = selectedTeacher.id + "_" + dateKey;
+      const docId = teacher.id + "_" + dateKey;
       const ref = db.collection("attendance").doc(docId);
+      let hours = "";
       if (action === "in") {
         await ref.set({
-          teacherId: selectedTeacher.id,
-          teacherName: selectedTeacher.name,
+          teacherId: teacher.id,
+          teacherName: teacher.name,
           date: dateKey,
           checkInAt: Date.now(),
           checkOutAt: null,
@@ -1252,23 +1621,72 @@
           ownerUid: uid,
         });
       } else {
-        await ref.update({ checkOutAt: Date.now() });
+        const checkOutAt = Date.now();
+        await ref.update({ checkOutAt });
+        const rec = attendanceRecordFor(teacher.id, dateKey);
+        if (rec && rec.checkInAt) hours = hoursBetween(rec.checkInAt, checkOutAt);
       }
-      checkinPanel.hidden = true;
+      setStepState("save", "done");
+      await sleep(200);
+      showVerifyResult(true, {
+        action,
+        time: timeLabel(Date.now()),
+        hours,
+        branchName,
+        distance,
+        accuracy,
+      });
     } catch (e) {
-      actionStatusLine.textContent = "Something went wrong, please try again.";
       console.error(e);
-      actionBtn.disabled = false;
+      showVerifyResult(false, { title: "Something Went Wrong", message: friendlyGeoError(e) });
     }
+  }
+
+  verifyCloseBtn.addEventListener("click", () => { verifyPanel.hidden = true; });
+  verifyResultOkBtn.addEventListener("click", () => {
+    verifyPanel.hidden = true;
+    checkinPanel.hidden = true;
+    const status = verifyResultTitle.textContent.includes("Failed") ? "error" : "success";
+    showToast(status, verifyResultTitle.textContent, "");
+  });
+  verifyRetryBtn.addEventListener("click", () => {
+    if (selectedTeacher) runCheckInFlow(selectedTeacher, heroActionBtn.dataset.action || "in");
   });
 
-  openCheckinBtn.addEventListener("click", openCheckinPanel);
+  // ---------- hero action (teacher's own check-in/out) ----------
+  heroActionBtn.addEventListener("click", () => {
+    const me = getMyTeacher();
+    const action = heroActionBtn.dataset.action;
+    if (!me || !action) return;
+    selectedTeacher = me;
+    runCheckInFlow(me, action);
+  });
+
+  // ---------- admin kiosk picker (check in on behalf of any teacher) ----------
+  function openCheckinPicker() {
+    checkinTeacherGrid.innerHTML = "";
+    const sorted = teachers.slice().sort((a, b) => a.name.localeCompare(b.name));
+    for (const t of sorted) {
+      const btn = document.createElement("button");
+      btn.className = "teacher-pick-btn";
+      btn.type = "button";
+      btn.textContent = t.name;
+      btn.addEventListener("click", () => {
+        selectedTeacher = t;
+        checkinPanel.hidden = true;
+        const rec = attendanceRecordFor(t.id, todayKey());
+        const action = !rec || !rec.checkInAt ? "in" : (!rec.checkOutAt ? "out" : null);
+        if (!action) { showToast("info", "Already checked out", t.name + " is done for today."); return; }
+        runCheckInFlow(t, action);
+      });
+      checkinTeacherGrid.appendChild(btn);
+    }
+    checkinPanel.hidden = false;
+  }
   checkinCloseBtn.addEventListener("click", () => { checkinPanel.hidden = true; });
+  manageBtn.addEventListener("click", openAdminPanel);
 
   // ---------- identity (which teacher is "me" on this device) ----------
-  // Claiming an identity (picking a name or self-registering) always exits
-  // admin mode on this device first — this is the one place a viewer's
-  // access level changes, so it must never leave a stale admin session behind.
   function becomeTeacher(teacherId) {
     isAdmin = false;
     sessionStorage.removeItem(ADMIN_SESSION_KEY);
@@ -1276,7 +1694,7 @@
     myTeacherId = teacherId;
     localStorage.setItem(MY_TEACHER_KEY, teacherId);
     identityPanel.hidden = true;
-    updateIdentityUI();
+    renderAll();
   }
 
   function isFullName(name) {
@@ -1285,12 +1703,15 @@
 
   registerNameBtn.addEventListener("click", async () => {
     const name = registerNameInput.value.trim();
+    registerNameInput.classList.remove("field-error");
     if (!name) {
       registerStatusLine.textContent = "Enter your name first.";
+      registerNameInput.classList.add("field-error");
       return;
     }
     if (!isFullName(name)) {
       registerStatusLine.textContent = "Please enter your full name (first, father's, and family name).";
+      registerNameInput.classList.add("field-error");
       return;
     }
     const existing = teachers.find((t) => t.name.toLowerCase() === name.toLowerCase());
@@ -1299,8 +1720,8 @@
       return;
     }
     const phone = registerPhoneInput.value.trim();
-    registerNameBtn.disabled = true;
-    registerStatusLine.textContent = "Registering...";
+    setBtnLoading(registerNameBtn, true);
+    registerStatusLine.textContent = "";
     try {
       await authReady;
       const doc = { name, createdAt: Date.now() };
@@ -1308,49 +1729,27 @@
       const ref = await db.collection("teachers").add(doc);
       registerNameInput.value = "";
       registerPhoneInput.value = "";
-      registerStatusLine.textContent = "";
       becomeTeacher(ref.id);
+      showToast("success", "Welcome, " + name.split(" ")[0] + "!", "You're all set to check in.");
     } catch (e) {
       registerStatusLine.textContent = "Could not register, please try again.";
       console.error(e);
     }
-    registerNameBtn.disabled = false;
+    setBtnLoading(registerNameBtn, false);
   });
   registerNameInput.addEventListener("keydown", (e) => { if (e.key === "Enter") registerNameBtn.click(); });
-
-  function updateIdentityUI() {
-    if (isAdmin) {
-      memberStrip.hidden = true;
-      identityPanel.hidden = true;
-      renderRoster();
-      return;
-    }
-    const me = getMyTeacher();
-    if (me) {
-      memberStrip.hidden = false;
-      memberName.textContent = me.name;
-      identityPanel.hidden = true;
-    } else {
-      memberStrip.hidden = true;
-      myTeacherId = null;
-      localStorage.removeItem(MY_TEACHER_KEY);
-      registerNameInput.value = "";
-      registerStatusLine.textContent = "";
-      identityPanel.hidden = false;
-    }
-    renderRoster();
-  }
+  registerPhoneInput.addEventListener("keydown", (e) => { if (e.key === "Enter") registerNameBtn.click(); });
 
   switchIdentityBtn.addEventListener("click", () => {
     myTeacherId = null;
     localStorage.removeItem(MY_TEACHER_KEY);
-    updateIdentityUI();
+    renderAll();
   });
 
   // ---------- admin unlock ----------
   function updateAdminBtn() {
     adminBtn.classList.toggle("on", isAdmin);
-    adminBtn.textContent = isAdmin ? "Admin ✓" : "Admin";
+    adminBtnLabel.textContent = isAdmin ? "Admin ✓" : "Admin";
   }
 
   adminBtn.addEventListener("click", () => {
@@ -1370,30 +1769,41 @@
       isAdmin = true;
       sessionStorage.setItem(ADMIN_SESSION_KEY, "1");
       updateAdminBtn();
-      updateIdentityUI();
+      renderAll();
       pinPanel.hidden = true;
-      openAdminPanel();
+      showToast("success", "Admin mode enabled", "");
     } else {
       pinStatusLine.textContent = "Incorrect PIN.";
     }
   });
   pinInput.addEventListener("keydown", (e) => { if (e.key === "Enter") pinSubmitBtn.click(); });
 
-  // ---------- admin panel ----------
+  // ---------- admin management sheet ----------
+  function switchAdminTab(key) {
+    for (const tab of adminTabs.querySelectorAll(".admin-tab")) tab.classList.toggle("active", tab.dataset.tab === key);
+    for (const panel of document.querySelectorAll(".admin-tab-panel")) panel.hidden = panel.id !== "tab-" + key;
+  }
+  adminTabs.addEventListener("click", (e) => {
+    const btn = e.target.closest(".admin-tab");
+    if (btn) switchAdminTab(btn.dataset.tab);
+  });
+
   function renderTeacherManageList() {
     teacherManageList.innerHTML = "";
     const sorted = teachers.slice().sort((a, b) => a.name.localeCompare(b.name));
+    if (sorted.length === 0) {
+      teacherManageList.appendChild(emptyStateEl('<circle cx="9" cy="7" r="4"/><path d="M3 21v-1a6 6 0 0 1 12 0v1"/>', "No teachers yet", "Add your first teacher above."));
+      return;
+    }
     for (const t of sorted) {
       const row = document.createElement("div");
-      row.className = "teacher-manage-row";
-      const name = document.createElement("span");
-      name.textContent = t.phone ? t.name + " · " + t.phone : t.name;
-      const del = document.createElement("button");
-      del.type = "button";
-      del.textContent = "Remove";
-      del.addEventListener("click", () => removeTeacher(t));
-      row.appendChild(name);
-      row.appendChild(del);
+      row.className = "manage-row";
+      row.innerHTML =
+        '<div class="info"><div class="name"></div><div class="sub"></div></div>' +
+        '<button class="icon-btn" type="button" title="Remove"><svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>';
+      row.querySelector(".name").textContent = t.name;
+      if (t.phone) row.querySelector(".sub").textContent = t.phone; else row.querySelector(".sub").remove();
+      row.querySelector(".icon-btn").addEventListener("click", () => removeTeacher(t));
       teacherManageList.appendChild(row);
     }
   }
@@ -1410,30 +1820,25 @@
     }
     branchManageList.innerHTML = "";
     const sorted = branches.slice().sort((a, b) => a.name.localeCompare(b.name));
+    if (sorted.length === 0) {
+      branchManageList.appendChild(emptyStateEl('<path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/>', "No branches yet", "Add a branch below to enable geofencing."));
+      return;
+    }
     for (const b of sorted) {
       const row = document.createElement("div");
-      row.className = "branch-manage-row";
-      const info = document.createElement("div");
-      info.className = "branch-info";
-      const name = document.createElement("div");
-      name.className = "branch-name";
-      name.textContent = b.name;
-      const radius = document.createElement("div");
-      radius.className = "branch-radius";
-      radius.textContent = "Radius " + (b.radiusMeters || 150) + "m";
-      info.appendChild(name);
-      info.appendChild(radius);
-      const del = document.createElement("button");
-      del.type = "button";
-      del.textContent = "Remove";
-      del.addEventListener("click", () => removeBranch(b));
-      row.appendChild(info);
-      row.appendChild(del);
+      row.className = "manage-row";
+      row.innerHTML =
+        '<div class="info"><div class="name"></div><div class="sub"></div></div>' +
+        '<button class="icon-btn" type="button" title="Remove"><svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>';
+      row.querySelector(".name").textContent = b.name;
+      row.querySelector(".sub").textContent = "Radius " + (b.radiusMeters || 150) + "m";
+      row.querySelector(".icon-btn").addEventListener("click", () => removeBranch(b));
       branchManageList.appendChild(row);
     }
   }
 
   function openAdminPanel() {
+    switchAdminTab("teachers");
     renderTeacherManageList();
     startTimeInput.value = settings.startTime || "08:00";
     renderBranchManageList();
@@ -1444,8 +1849,105 @@
       reportToInput.value = todayKey();
     }
     renderReportSummary();
-    adminStatusLine.textContent = "";
     adminPanel.hidden = false;
+  }
+  adminCloseBtn.addEventListener("click", () => { adminPanel.hidden = true; });
+
+  exitAdminBtn.addEventListener("click", async () => {
+    const ok = await askConfirm("Exit Admin Mode?", "You'll need the PIN again to get back into Admin on this device.", "Exit Admin Mode");
+    if (!ok) return;
+    isAdmin = false;
+    sessionStorage.removeItem(ADMIN_SESSION_KEY);
+    updateAdminBtn();
+    adminPanel.hidden = true;
+    renderAll();
+  });
+
+  addTeacherBtn.addEventListener("click", async () => {
+    const name = newTeacherInput.value.trim();
+    if (!name) { newTeacherInput.classList.add("field-error"); newTeacherInput.focus(); return; }
+    newTeacherInput.classList.remove("field-error");
+    const phone = newTeacherPhoneInput.value.trim();
+    setBtnLoading(addTeacherBtn, true);
+    try {
+      await authReady;
+      const doc = { name, createdAt: Date.now() };
+      if (phone) doc.phone = phone;
+      await db.collection("teachers").add(doc);
+      newTeacherInput.value = "";
+      newTeacherPhoneInput.value = "";
+      showToast("success", "Teacher added", name);
+    } catch (e) {
+      showToast("error", "Could not add teacher", "Please try again.");
+      console.error(e);
+    }
+    setBtnLoading(addTeacherBtn, false);
+  });
+  newTeacherInput.addEventListener("keydown", (e) => { if (e.key === "Enter") addTeacherBtn.click(); });
+  newTeacherPhoneInput.addEventListener("keydown", (e) => { if (e.key === "Enter") addTeacherBtn.click(); });
+
+  async function removeTeacher(teacher) {
+    const ok = await askConfirm("Remove Teacher?", 'Remove "' + teacher.name + '" from the staff list? Their past attendance records are kept.', "Remove");
+    if (!ok) return;
+    try {
+      await db.collection("teachers").doc(teacher.id).delete();
+      showToast("success", "Teacher removed", teacher.name);
+    } catch (e) {
+      showToast("error", "Could not remove teacher", "Please try again.");
+      console.error(e);
+    }
+  }
+
+  saveStartTimeBtn.addEventListener("click", async () => {
+    const val = startTimeInput.value;
+    if (!val) return;
+    setBtnLoading(saveStartTimeBtn, true);
+    try {
+      await authReady;
+      await db.collection("settings").doc("config").set({ startTime: val }, { merge: true });
+      showToast("success", "Start time saved", val);
+    } catch (e) {
+      showToast("error", "Could not save", "Please try again.");
+      console.error(e);
+    }
+    setBtnLoading(saveStartTimeBtn, false);
+  });
+
+  useMyLocationBtn.addEventListener("click", async () => {
+    const name = newBranchInput.value.trim();
+    if (!name) { newBranchInput.classList.add("field-error"); newBranchInput.focus(); return; }
+    newBranchInput.classList.remove("field-error");
+    const radius = parseInt(radiusInput.value, 10) || 150;
+    setBtnLoading(useMyLocationBtn, true);
+    try {
+      const pos = await getCurrentPosition({ enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+      await authReady;
+      await db.collection("branches").add({
+        name,
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude,
+        radiusMeters: radius,
+        createdAt: Date.now(),
+      });
+      newBranchInput.value = "";
+      showToast("success", "Branch saved", '"' + name + '" saved from your current location.');
+    } catch (e) {
+      showToast("error", "Could not get location", friendlyGeoError(e));
+      console.error(e);
+    }
+    setBtnLoading(useMyLocationBtn, false);
+  });
+
+  async function removeBranch(branch) {
+    const ok = await askConfirm("Remove Branch?", 'Remove branch "' + branch.name + '"? Teachers will no longer be able to check in from there.', "Remove");
+    if (!ok) return;
+    try {
+      await db.collection("branches").doc(branch.id).delete();
+      showToast("success", "Branch removed", branch.name);
+    } catch (e) {
+      showToast("error", "Could not remove branch", "Please try again.");
+      console.error(e);
+    }
   }
 
   // ---------- reports & export ----------
@@ -1479,23 +1981,15 @@
     reportSummaryList.innerHTML = "";
     const sorted = Array.from(byTeacher.values()).sort((a, b) => a.name.localeCompare(b.name));
     if (sorted.length === 0) {
-      const row = document.createElement("div");
-      row.className = "teacher-manage-row";
-      row.textContent = "No data in this range.";
-      reportSummaryList.appendChild(row);
+      reportSummaryList.appendChild(emptyStateEl('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/>', "No data", "No attendance in this range."));
       return;
     }
     for (const entry of sorted) {
       const row = document.createElement("div");
-      row.className = "teacher-manage-row";
-      const name = document.createElement("span");
-      name.textContent = entry.name;
-      const stats = document.createElement("span");
-      stats.style.color = "var(--ink-soft)";
-      stats.style.fontSize = "12px";
-      stats.textContent = entry.present + " present · " + entry.late + " late · " + entry.hours.toFixed(1) + "h";
-      row.appendChild(name);
-      row.appendChild(stats);
+      row.className = "report-row";
+      row.innerHTML = '<span class="name"></span><span class="stats"></span>';
+      row.querySelector(".name").textContent = entry.name;
+      row.querySelector(".stats").textContent = entry.present + " present · " + entry.late + " late · " + entry.hours.toFixed(1) + "h";
       reportSummaryList.appendChild(row);
     }
   }
@@ -1536,108 +2030,21 @@
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    showToast("success", "CSV exported", lines.length - 1 + " records exported.");
   });
-
-  adminCloseBtn.addEventListener("click", () => { adminPanel.hidden = true; });
-
-  exitAdminBtn.addEventListener("click", () => {
-    if (!confirm("Exit Admin Mode on this device? You'll need the PIN again to get back in.")) return;
-    isAdmin = false;
-    sessionStorage.removeItem(ADMIN_SESSION_KEY);
-    updateAdminBtn();
-    adminPanel.hidden = true;
-    updateIdentityUI();
-  });
-
-  addTeacherBtn.addEventListener("click", async () => {
-    const name = newTeacherInput.value.trim();
-    if (!name) return;
-    const phone = newTeacherPhoneInput.value.trim();
-    addTeacherBtn.disabled = true;
-    try {
-      await authReady;
-      const doc = { name, createdAt: Date.now() };
-      if (phone) doc.phone = phone;
-      await db.collection("teachers").add(doc);
-      newTeacherInput.value = "";
-      newTeacherPhoneInput.value = "";
-    } catch (e) {
-      adminStatusLine.textContent = "Could not add teacher, please try again.";
-      console.error(e);
-    }
-    addTeacherBtn.disabled = false;
-  });
-  newTeacherInput.addEventListener("keydown", (e) => { if (e.key === "Enter") addTeacherBtn.click(); });
-
-  async function removeTeacher(teacher) {
-    if (!confirm('Remove "' + teacher.name + '" from the teacher list? Their past attendance records are kept.')) return;
-    try {
-      await db.collection("teachers").doc(teacher.id).delete();
-    } catch (e) {
-      adminStatusLine.textContent = "Could not remove teacher, please try again.";
-      console.error(e);
-    }
-  }
-
-  saveStartTimeBtn.addEventListener("click", async () => {
-    const val = startTimeInput.value;
-    if (!val) return;
-    saveStartTimeBtn.disabled = true;
-    try {
-      await authReady;
-      await db.collection("settings").doc("config").set({ startTime: val }, { merge: true });
-      adminStatusLine.textContent = "Saved.";
-    } catch (e) {
-      adminStatusLine.textContent = "Could not save, please try again.";
-      console.error(e);
-    }
-    saveStartTimeBtn.disabled = false;
-  });
-
-  useMyLocationBtn.addEventListener("click", async () => {
-    const name = newBranchInput.value.trim();
-    if (!name) {
-      adminStatusLine.textContent = "Enter a branch name first.";
-      return;
-    }
-    const radius = parseInt(radiusInput.value, 10) || 150;
-    useMyLocationBtn.disabled = true;
-    adminStatusLine.textContent = "Getting your current location...";
-    try {
-      const pos = await getCurrentPosition({ enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
-      await authReady;
-      await db.collection("branches").add({
-        name,
-        lat: pos.coords.latitude,
-        lng: pos.coords.longitude,
-        radiusMeters: radius,
-        createdAt: Date.now(),
-      });
-      newBranchInput.value = "";
-      adminStatusLine.textContent = '"' + name + '" saved from where you\'re standing.';
-    } catch (e) {
-      adminStatusLine.textContent = friendlyGeoError(e);
-      console.error(e);
-    }
-    useMyLocationBtn.disabled = false;
-  });
-
-  async function removeBranch(branch) {
-    if (!confirm('Remove branch "' + branch.name + '"? Teachers will no longer be able to check in from there.')) return;
-    try {
-      await db.collection("branches").doc(branch.id).delete();
-    } catch (e) {
-      adminStatusLine.textContent = "Could not remove branch, please try again.";
-      console.error(e);
-    }
-  }
 
   // ---------- live data ----------
+  function markLoaded() {
+    if (hasLoadedOnce) return;
+    hasLoadedOnce = true;
+    loadingSkeleton.hidden = true;
+  }
+
   db.collection("teachers").orderBy("createdAt", "asc").onSnapshot(
     (snap) => {
       teachers = snap.docs.map((d) => Object.assign({ id: d.id }, d.data()));
-      updateIdentityUI();
-      if (!adminPanel.hidden) renderTeacherManageList();
+      markLoaded();
+      renderAll();
     },
     (err) => console.error(err)
   );
@@ -1650,8 +2057,7 @@
         if (!attendanceByDate.has(rec.date)) attendanceByDate.set(rec.date, new Map());
         attendanceByDate.get(rec.date).set(rec.teacherId, rec);
       }
-      renderRoster();
-      if (!adminPanel.hidden) renderReportSummary();
+      renderAll();
     },
     (err) => console.error(err)
   );
@@ -1659,7 +2065,7 @@
   db.collection("branches").orderBy("createdAt", "asc").onSnapshot(
     (snap) => {
       branches = snap.docs.map((d) => Object.assign({ id: d.id }, d.data()));
-      if (!adminPanel.hidden) renderBranchManageList();
+      renderAll();
     },
     (err) => console.error(err)
   );
@@ -1667,7 +2073,7 @@
   db.collection("settings").doc("config").onSnapshot(
     (doc) => {
       if (doc.exists) settings = Object.assign({ startTime: "08:00" }, doc.data());
-      renderRoster();
+      renderAll();
     },
     (err) => console.error(err)
   );
@@ -1679,7 +2085,6 @@
   }
 
   updateAdminBtn();
-  updateIdentityUI();
 })();
 </script>
 </body>
